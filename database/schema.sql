@@ -22,7 +22,7 @@ CREATE TABLE events (
     event_end_date      DATETIME        NOT NULL,
     event_seats         INT             NOT NULL,
     event_description   LONGTEXT        NOT NULL,
-    event_thumbnail     VARCHAR(255)    NOT NULL,
+    event_thumbnail     VARCHAR(2048)   NOT NULL,
     location_id         INT             NOT NULL, -- foreign key
     PRIMARY KEY (event_id),
     FOREIGN KEY (location_id) REFERENCES locations(location_id),
@@ -69,6 +69,6 @@ CREATE TABLE postal_codes (
 -- Create cities table:
  CREATE TABLE cities (
     city_id             INT             AUTO_INCREMENT, -- primary key
-    city_name           VARCHAR(100)     NOT NULL,
+    city_name           VARCHAR(100)    NOT NULL,
     PRIMARY KEY (city_id)
  );
