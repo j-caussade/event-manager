@@ -56,3 +56,4 @@ This conventions are inspired by [Commits Conventionnels naming convention](http
 #### Branch
 
 - **`master`:** Main branch.
+- **`php-architecture`:** Legacy branch.
