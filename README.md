@@ -10,9 +10,7 @@ Project of event management.
 
 - [Local Installation Procedure](#local-installation-procedure)
 - [Project Architecture Overview](#project-architecture-overview)
-- [Usage](#usage)
 - [Contribution Guidelines](#contribution-guidelines)
-- [Deployment](#deployment)
 
 ## Local Installation Procedure
 
@@ -44,7 +42,7 @@ This conventions are inspired by [Commits Conventionnels naming convention](http
 ##### Types list
 
 - **fix:** A bug fix.
-- **feat**: A new feature ("create" previously).
+- **feat**: A new feature.
 - **update**: A content or database updating, an optimization (refactor, style, ui/ux).
 - **test**: For testing something.
 - **chore**: To group certain changes such as multiple fix and update.
