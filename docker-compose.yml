@@ -1,0 +1,63 @@
+# Define the services/containers to be run
+services:
+  # Database Service
+  db:
+    # Use the latest version of the MySQL official image
+    image: mysql:latest
+    # Environment variables for MySQL configuration
+    # These variables are loaded from the .env file to keep sensitive data secure
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD} # Root password for MySQL
+      MYSQL_DATABASE: ${DB_NAME} # Database name to be created
+      MYSQL_USER: ${DB_USER} # Database user
+      MYSQL_PASSWORD: ${DB_PASSWORD} # Password for the database user
+    # Map port 3307 on the host to port 3306 on the container
+    ports:
+      - "3307:3306"
+    # Mount the SQL schema file to initialize the database
+    volumes:
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    # Connect to a custom network to enable communication between containers
+    networks:
+      - app-network
+
+  # Backend Service
+  backend:
+    # Build the Docker image using the Dockerfile in ./server directory
+    build: ./server
+    # Map port 3000 on the host to port 3000 on the container
+    ports:
+      - "3000:3000"
+    # Environment variables for backend service
+    # These variables are loaded from the .env file for security and configuration management
+    environment:
+      DB_HOST: db # Database service name as host
+      DB_USER: ${DB_USER} # Database user (matches the MYSQL_USER above)
+      DB_PASSWORD: ${DB_PASSWORD} # Database password (matches the MYSQL_PASSWORD above)
+      DB_NAME: ${DB_NAME} # Database name (matches the MYSQL_DATABASE above)
+    # Ensure that the db service is started before this service
+    depends_on:
+      - db
+    # Connect to a custom network to enable communication between containers
+    networks:
+      - app-network
+
+  # phpMyAdmin Service
+  phpmyadmin:
+    # Use the latest version of phpMyAdmin image
+    image: phpmyadmin:latest
+    ports:
+      - "8080:80" # Map port 8080 on the host to port 80 in the container
+    environment:
+      PMA_HOST: db # The hostname of the database service to connect to
+      PMA_PORT: 3306 # The port number of the database service
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD} # Connect with root password
+    depends_on:
+      - db # Ensure that the db service is available before starting phpMyAdmin
+    networks:
+      - app-network # Connect to the same network as other services to allow communication
+
+# Define a custom network to enable communication between the db and backend services
+networks:
+  app-network:
+    driver: bridge
