@@ -1,9 +1,11 @@
--- Create database:
-CREATE DATABASE event_manager;
+-- Create database if not exists:
+CREATE DATABASE IF NOT EXISTS event_manager;
 USE event_manager; -- select database
 
--- Create users table:
-CREATE TABLE users (
+-- Create tables only if they do not exist:
+
+-- Create users table if not exists:
+CREATE TABLE IF NOT EXISTS users (
     user_id             INT             AUTO_INCREMENT, -- primary key
     user_first_name     VARCHAR(50)     NOT NULL,
     user_last_name      VARCHAR(50)     NOT NULL,
@@ -14,8 +16,43 @@ CREATE TABLE users (
     UNIQUE (user_email)
 );
 
--- Create events table:
-CREATE TABLE events (
+-- Create cities table if not exists:
+CREATE TABLE IF NOT EXISTS cities (
+    city_id             INT             AUTO_INCREMENT, -- primary key
+    city_name           VARCHAR(100)    NOT NULL,
+    PRIMARY KEY (city_id)
+);
+
+-- Create postal_codes table if not exists:
+CREATE TABLE IF NOT EXISTS postal_codes (
+    postal_code_id      INT             AUTO_INCREMENT, -- primary key
+    postal_code_number  INT             NOT NULL,
+    PRIMARY KEY (postal_code_id),
+    UNIQUE (postal_code_number)
+);
+
+-- Create locations table if not exists:
+CREATE TABLE IF NOT EXISTS locations (
+    location_id         INT             AUTO_INCREMENT, -- primary key
+    location_name       VARCHAR(100),
+    location_address    VARCHAR(255)    NOT NULL,
+    postal_code_id      INT             NOT NULL, -- foreign key
+    city_id             INT             NOT NULL, -- foreign key
+    PRIMARY KEY (location_id),
+    FOREIGN KEY (postal_code_id) REFERENCES postal_codes(postal_code_id),
+    FOREIGN KEY (city_id) REFERENCES cities(city_id)
+);
+
+-- Create organizers table if not exists:
+CREATE TABLE IF NOT EXISTS organizers (
+    organizer_id        INT             AUTO_INCREMENT, -- primary key
+    organizer_name      VARCHAR(100)     NOT NULL,
+    PRIMARY KEY (organizer_id),
+    UNIQUE (organizer_name)
+);
+
+-- Create events table if not exists:
+CREATE TABLE IF NOT EXISTS events (
     event_id            INT             AUTO_INCREMENT, -- primary key
     event_name          VARCHAR(100)    NOT NULL,
     event_start_date    DATETIME        NOT NULL,
@@ -29,46 +66,20 @@ CREATE TABLE events (
     CHECK (event_start_date < event_end_date)
 );
 
--- Create events_organizers intermediate table:
-CREATE TABLE events_organizers (
+-- Create organize intermediate table if not exists:
+CREATE TABLE IF NOT EXISTS organize (
     event_id            INT             NOT NULL, -- foreign key
     organizer_id        INT             NOT NULL, -- foreign key
     PRIMARY KEY (event_id, organizer_id),
     FOREIGN KEY (event_id) REFERENCES events(event_id) ON DELETE CASCADE,
-    FOREIGN KEY (organizer_id) REFERENCES organizers(organizer_id) ON DELETE CASCADE,
+    FOREIGN KEY (organizer_id) REFERENCES organizers(organizer_id) ON DELETE CASCADE
 );
 
--- Create organizers table:
-CREATE TABLE organizers (
-    organizer_id        INT             AUTO_INCREMENT, -- primary key
-    organizer_name      VARCHAR(100)     NOT NULL,
-    PRIMARY KEY (organizer_id),
-    UNIQUE (organizer_name)
+-- Create register intermediate table if not exists:
+CREATE TABLE IF NOT EXISTS register (
+    user_id             INT             NOT NULL, -- foreign key
+    event_id            INT             NOT NULL, -- foreign key
+    PRIMARY KEY (user_id, event_id),
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (event_id) REFERENCES events(event_id) ON DELETE CASCADE
 );
-
--- Create locations table:
-CREATE TABLE locations (
-    location_id         INT             AUTO_INCREMENT, -- primary key
-    location_name       VARCHAR(100)    ,
-    location_address    VARCHAR (255)   NOT NULL,
-    postal_code_id      INT             NOT NULL, -- foreign key
-    city_id             INT             NOT NULL, -- foreign key
-    PRIMARY KEY (location_id),
-    FOREIGN KEY (postal_code_id) REFERENCES postal_codes(postal_code_id),
-    FOREIGN KEY (city_id) REFERENCES cities(city_id)
-);
-
--- Create postal_codes table:
-CREATE TABLE postal_codes (
-    postal_code_id      INT             AUTO_INCREMENT, -- primary key
-    postal_code_number  INT             NOT NULL,
-    PRIMARY KEY (postal_code_id),
-    UNIQUE (postal_code_number)
-);
-
--- Create cities table:
- CREATE TABLE cities (
-    city_id             INT             AUTO_INCREMENT, -- primary key
-    city_name           VARCHAR(100)    NOT NULL,
-    PRIMARY KEY (city_id)
- );
