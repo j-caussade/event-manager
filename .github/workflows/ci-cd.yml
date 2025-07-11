@@ -30,7 +30,9 @@ jobs:
         working-directory: ./server
         run: |
           npm install
-          npm test
+          npm test -- --detectOpenHandles --forceExit
+        env:
+          CI: true
 
   # Job for deploying to VPS, depends on the test job
   deploy:
