@@ -9,6 +9,12 @@ app.get("/", (req, res) => {
   res.send("Adishatz moùnde !");
 });
 
-app.listen(port, hostname, () => {
-  console.log(`App runing at http://${hostname}:${port}`);
-});
+// Export the application for testing
+module.exports = app;
+
+// Only start the server if this file is executed directly
+if (require.main === module) {
+  app.listen(port, hostname, () => {
+    console.log(`App running at http://${hostname}:${port}`);
+  });
+}
