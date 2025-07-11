@@ -17,7 +17,8 @@ RUN npm install
 COPY . .
 
 # Expose the port on which the application listens
-EXPOSE 3000
+EXPOSE ${PORT:-3000}
 
 # Command to start the application
-CMD ["node", "app.js"]
+CMD ["sh", "-c", "if [ \"$NODE_ENV\" = \"dev\" ]; then npm run dev; elif [ \"$NODE_ENV\" = \"prod\" ]; then npm run prod; else echo \"NODE_ENV must be either 'dev' or 'prod'\"; exit 1; fi"]
+
