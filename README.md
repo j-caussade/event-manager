@@ -81,3 +81,17 @@ Adhere to the established naming conventions for the project. These conventions 
 2. **Configuration**: Create a `<project name>.conf` file in the `./etc/apache2/sites-available/` directory and specify the presence of a reverse proxy to point to the localhost and the port chosen for the backend. You can use and configure SSL certificates with [certbot](https://certbot.eff.org/). After configuring the project, you can run the command `sudo a2ensite <project name>.conf` to enable the project and reload the Apache server with `sudo systemctl reload apache2`. Don't forget to register the new DNS with the hosting platform.
 
 3. **Configure and launch Docker**: Go to the project directory `./var/www/<project name>/`, create the `.env` file based on the example, and run the command `sudo docker compose up`.
+
+### Update
+
+To ensure that the deployment on the VPS is updated automatically with the latest changes from the repository, a Continuous Integration/Continuous Deployment (CI/CD) pipeline has been set up using GitHub Actions.
+
+#### CI/CD Pipeline Overview
+
+The pipeline performs the following steps:
+
+1. **Checkout Code**: The latest code is checked out from the repository.
+2. **Deploy to VPS**: The code is copied to the VPS using SCP (Secure Copy Protocol).
+3. **Configure and Launch Docker**: On the VPS, Docker Compose is used to pull the latest images, rebuild the containers if necessary, and restart the containers to apply the latest changes.
+
+This pipeline ensures that any changes pushed to the `master` branch are automatically deployed to the VPS, keeping the production environment up-to-date with the latest code.
