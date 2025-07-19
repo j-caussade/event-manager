@@ -6,7 +6,7 @@ const port = process.env.PORT || 3000;
 const hostname = process.env.HOST || "localhost";
 
 app.get("/", (req, res) => {
-  res.send("Adishatz moùnde !");
+  res.send("2025/07/19: Adishatz moùnde !");
 });
 
 // Export the application for testing
