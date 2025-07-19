@@ -29,3 +29,4 @@ jobs:
             cd /var/www/eventura
             sudo docker compose pull
             sudo docker compose up -d --build
+            sudo docker restart eventura-backend-1
