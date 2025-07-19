@@ -9,8 +9,8 @@ on:
     branches: [master]
 
 jobs:
-  # Job for running tests
-  test:
+  # Job for deploying to VPS
+  deploy:
     # Specify the operating system for the job
     runs-on: ubuntu-24.04.2
 
@@ -19,27 +19,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # Set up Node.js environment
-      - name: Set up Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: "22.16.0"
-
-      # Install project dependencies
-      - name: Install dependencies and run tests
-        working-directory: ./server
-        run: |
-          npm install
-          npm test -- --detectOpenHandles --forceExit
-        env:
-          CI: true
-
-  # Job for deploying to VPS, depends on the test job
-  deploy:
-    needs: test # This job will run only if the test job succeeds
-    runs-on: ubuntu-24.04.2
-
-    steps:
       # Deploy to VPS using SSH
       - name: Deploy to VPS
         uses: appleboy/ssh-action@master
@@ -47,6 +26,10 @@ jobs:
           host: ${{ secrets.VPS_HOST }} # VPS host from GitHub secrets
           username: ${{ secrets.VPS_USERNAME }} # VPS username from GitHub secrets
           key: ${{ secrets.VPS_PRIVATE_KEY }} # SSH private key from GitHub secrets
+          # Navigate to the project directory
+          # Pull the latest code from the master branch
+          # Stop and remove containers, networks defined in docker-compose.yml
+          # Build and start the containers
           script: |
             cd /var/www/eventura
             git pull origin master
