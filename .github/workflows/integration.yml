@@ -1,0 +1,30 @@
+name: Integration
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "22.16.0"
+
+      - name: Print Node.js and npm versions
+        run: |
+          node -v
+          npm -v
+
+      - name: Install dependencies and run tests
+        working-directory: ./server
+        run: |
+          npm install
+          npm test -- --detectOpenHandles --forceExit
+        env:
+          CI: true
