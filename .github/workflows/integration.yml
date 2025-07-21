@@ -1,30 +1,44 @@
+# Name of the workflow
 name: Integration
+
+# Trigger the workflow on pull request events targeting the master branch
 on:
   pull_request:
     branches:
       - master
 
 jobs:
+  # Job for running tests
   test:
+    # Specify the operating system for the job
     runs-on: ubuntu-latest
+
     steps:
+      # Checkout the repository code to the runner
       - name: Checkout code
         uses: actions/checkout@v3
 
+      # Set up Node.js environment with the specified version
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: "22.16.0"
+          node-version: "22.16.0" # Specify the Node.js version to be used
 
+      # Print the versions of Node.js and npm to verify the setup
       - name: Print Node.js and npm versions
+        # Command to print the Node.js version
+        # Command to print the npm version
         run: |
-          node -v
+          node -v 
           npm -v
 
+      # Install dependencies and run tests in the specified working directory
       - name: Install dependencies and run tests
-        working-directory: ./server
+        working-directory: ./server # Specify the directory where the server code is located
+        # Command to install project dependencies
+        # Command to run tests with additional options
         run: |
           npm install
           npm test -- --detectOpenHandles --forceExit
         env:
-          CI: true
+          CI: true # Set the CI environment variable to true
