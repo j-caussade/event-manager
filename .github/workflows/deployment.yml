@@ -1,30 +1,44 @@
+# Name of the workflow
 name: Deployment
+
+# Trigger the workflow on push events to the master branch
 on:
   push:
     branches:
       - master
+
 jobs:
+  # Job for deploying the application
   deploy:
+    # Specify the operating system for the job
     runs-on: ubuntu-latest
+
     steps:
+      # Checkout the repository code to the runner
       - name: Checkout code
         uses: actions/checkout@v3
 
+      # Copy the project files to the VPS using SCP
       - name: Deploy to VPS
         uses: appleboy/scp-action@v0.1.4
         with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USERNAME }}
-          key: ${{ secrets.VPS_PRIVATE_KEY }}
-          source: "."
-          target: "/var/www/eventura"
+          host: ${{ secrets.VPS_HOST }} # The VPS host address from GitHub secrets
+          username: ${{ secrets.VPS_USERNAME }} # The VPS username from GitHub secrets
+          key: ${{ secrets.VPS_PRIVATE_KEY }} # The SSH private key from GitHub secrets
+          source: "." # Source directory to copy, here it's the current directory
+          target: "/var/www/eventura" # Target directory on the VPS
 
+      # SSH into the VPS to configure and launch Docker containers
       - name: Configure and launch Docker
         uses: appleboy/ssh-action@v1.0.0
         with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USERNAME }}
-          key: ${{ secrets.VPS_PRIVATE_KEY }}
+          host: ${{ secrets.VPS_HOST }} # The VPS host address from GitHub secrets
+          username: ${{ secrets.VPS_USERNAME }} # The VPS username from GitHub secrets
+          key: ${{ secrets.VPS_PRIVATE_KEY }} # The SSH private key from GitHub secrets
+          # Navigate to the project directory on the VPS
+          # Pull the latest Docker images
+          # Build and start the Docker containers in detached mode
+          # Restart the specific Docker container
           script: |
             cd /var/www/eventura
             sudo docker compose pull
