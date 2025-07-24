@@ -15,13 +15,13 @@ services:
     # Map port 3306 by default or a custom one on the host to port 3306 on the container
     ports:
       - "${MYSQL_PORT:-3306}:3306"
-    # Mount the SQL schema file to initialize the database
+
     volumes:
-      - ./database/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/1-schema.sql # Mount the SQL schema file to initialize the database
       - mysql_data:/var/lib/mysql # Persist database data
-    # Connect to a custom network to enable communication between containers
+      - ./database/data.sql:/docker-entrypoint-initdb.d/2-data.sql # Mount the SQL data and seed data files to fill the database
     networks:
-      - app-network
+      - app-network # Connect to a custom network
 
   # Backend Service
   backend:
