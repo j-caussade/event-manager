@@ -1,5 +1,5 @@
 -- Utiliser la base de données
-USE event_manager;
+USE eventura;
 
 -- Insérer des données dans la table users
 INSERT INTO users (user_first_name, user_last_name, user_email, user_password, user_is_admin) VALUES
