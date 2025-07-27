@@ -1,6 +1,6 @@
 -- Create database if not exists:
-CREATE DATABASE IF NOT EXISTS event_manager;
-USE event_manager; -- select database
+CREATE DATABASE IF NOT EXISTS eventura;
+USE eventura; -- select database
 
 -- Create tables only if they do not exist:
 
