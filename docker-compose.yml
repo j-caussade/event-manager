@@ -17,8 +17,8 @@ services:
       - "${MYSQL_PORT:-3306}:3306"
 
     volumes:
-      - ./database/schema.sql:/docker-entrypoint-initdb.d/1-schema.sql # Mount the SQL schema file to initialize the database
       - mysql_data:/var/lib/mysql # Persist database data
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/1-schema.sql # Mount the SQL schema file to initialize the database
       - ./database/data.sql:/docker-entrypoint-initdb.d/2-data.sql # Mount the SQL data and seed data files to fill the database
     networks:
       - app-network # Connect to a custom network
