@@ -4,7 +4,7 @@ services:
   db:
     # Use a LTS version of the MySQL official image
     image: mysql:8.0
-    restart: always
+    restart: on-failure
     # Environment variables for MySQL configuration
     # These variables are loaded from the .env file to keep sensitive data secure
     environment:
