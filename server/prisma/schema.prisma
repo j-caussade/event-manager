@@ -1,0 +1,88 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DB_URL")
+}
+
+model cities {
+  city_id   Int         @id @default(autoincrement())
+  city_name String      @db.VarChar(100)
+  locations locations[]
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model events {
+  event_id          Int        @id @default(autoincrement())
+  event_name        String     @db.VarChar(100)
+  event_start_date  DateTime   @db.DateTime(0)
+  event_end_date    DateTime   @db.DateTime(0)
+  event_seats       Int
+  event_description String     @db.LongText
+  event_thumbnail   String     @db.VarChar(2048)
+  location_id       Int
+  locations         locations  @relation(fields: [location_id], references: [location_id], onDelete: NoAction, onUpdate: NoAction, map: "events_ibfk_1")
+  organize          organize[]
+  register          register[]
+
+  @@index([location_id], map: "location_id")
+}
+
+model locations {
+  location_id      Int          @id @default(autoincrement())
+  location_name    String?      @db.VarChar(100)
+  location_address String       @db.VarChar(255)
+  postal_code_id   Int
+  city_id          Int
+  events           events[]
+  postal_codes     postal_codes @relation(fields: [postal_code_id], references: [postal_code_id], onDelete: NoAction, onUpdate: NoAction, map: "locations_ibfk_1")
+  cities           cities       @relation(fields: [city_id], references: [city_id], onDelete: NoAction, onUpdate: NoAction, map: "locations_ibfk_2")
+
+  @@index([city_id], map: "city_id")
+  @@index([postal_code_id], map: "postal_code_id")
+}
+
+model organize {
+  event_id     Int
+  organizer_id Int
+  events       events     @relation(fields: [event_id], references: [event_id], onDelete: Cascade, onUpdate: NoAction, map: "organize_ibfk_1")
+  organizers   organizers @relation(fields: [organizer_id], references: [organizer_id], onDelete: Cascade, onUpdate: NoAction, map: "organize_ibfk_2")
+
+  @@id([event_id, organizer_id])
+  @@index([organizer_id], map: "organizer_id")
+}
+
+model organizers {
+  organizer_id   Int        @id @default(autoincrement())
+  organizer_name String     @unique(map: "organizer_name") @db.VarChar(100)
+  organize       organize[]
+}
+
+model postal_codes {
+  postal_code_id     Int         @id @default(autoincrement())
+  postal_code_number Int         @unique(map: "postal_code_number")
+  locations          locations[]
+}
+
+model register {
+  user_id  Int
+  event_id Int
+  users    users  @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction, map: "register_ibfk_1")
+  events   events @relation(fields: [event_id], references: [event_id], onDelete: Cascade, onUpdate: NoAction, map: "register_ibfk_2")
+
+  @@id([user_id, event_id])
+  @@index([event_id], map: "event_id")
+}
+
+model users {
+  user_id         Int        @id @default(autoincrement())
+  user_first_name String     @db.VarChar(50)
+  user_last_name  String     @db.VarChar(50)
+  user_email      String     @unique(map: "user_email") @db.VarChar(320)
+  user_password   String     @db.VarChar(50)
+  user_is_admin   Boolean    @default(false)
+  register        register[]
+}

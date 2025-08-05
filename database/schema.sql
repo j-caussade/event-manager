@@ -83,3 +83,12 @@ CREATE TABLE IF NOT EXISTS register (
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
     FOREIGN KEY (event_id) REFERENCES events(event_id) ON DELETE CASCADE
 );
+
+-- Créer un utilisateur avec le bon plugin d'authentification
+CREATE USER IF NOT EXISTS 'user'@'%' IDENTIFIED WITH mysql_native_password BY 'password';
+
+-- Donner les permissions nécessaires à l'utilisateur
+GRANT ALL PRIVILEGES ON votre_base_de_donnees.* TO 'user'@'%';
+
+-- Appliquer les modifications
+FLUSH PRIVILEGES;
