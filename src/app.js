@@ -7,8 +7,15 @@ const express = require("express");
 // Create an instance of an Express application
 const app = express();
 
-// Import the event routes from the specified route file
+// Import routes from the specified route file
 const eventRoutes = require("./routes/eventRoutes");
+const cityRoutes = require("./routes/cityRoutes");
+const locationRoutes = require("./routes/locationRoutes");
+const organizeRoutes = require("./routes/organizeRoutes");
+const organizerRoutes = require("./routes/organizerRoutes");
+const postalCodeRoutes = require("./routes/postalCodeRoutes");
+const registerRoutes = require("./routes/registerRoutes");
+const userRoutes = require("./routes/userRoutes");
 
 // Middleware to parse incoming JSON request bodies
 app.use(express.json());
@@ -27,8 +34,15 @@ app.get("/", (req, res) => {
   res.send("Adishatz moùnde !");
 });
 
-// Use the event routes for requests to "/api/v1/events"
+// Use routes for requests to "/api/v1/:name"
 app.use("/api/v1/events", eventRoutes);
+app.use("/api/v1/cities", cityRoutes);
+app.use("/api/v1/locations", locationRoutes);
+app.use("/api/v1/organize", organizeRoutes);
+app.use("/api/v1/organizers", organizerRoutes);
+app.use("/api/v1/postal-codes", postalCodeRoutes);
+app.use("/api/v1/register", registerRoutes);
+app.use("/api/v1/users", userRoutes);
 
 // Export the Express application for potential use in testing or other modules
 module.exports = app;
