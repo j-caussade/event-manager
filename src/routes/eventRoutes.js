@@ -13,7 +13,7 @@ const eventController = require("../controllers/eventController");
  * This route handles POST requests to create a new event.
  * It uses the createEvent function from the eventController to process the request.
  */
-router.post("/create", eventController.createEvent);
+router.post("/", eventController.createEvent);
 
 /**
  * Route to get all events.
@@ -29,7 +29,7 @@ router.get("/", eventController.getAllEvents);
  * This route handles GET requests to retrieve a specific event by its ID.
  * It uses the getEventById function from the eventController to process the request.
  */
-router.get("/read/:id", eventController.getEventById);
+router.get("/:id", eventController.getEventById);
 
 /**
  * Route to update an existing event.
@@ -37,7 +37,7 @@ router.get("/read/:id", eventController.getEventById);
  * This route handles PUT requests to update an existing event by its ID.
  * It uses the updateEvent function from the eventController to process the request.
  */
-router.put("/update/:id", eventController.updateEvent);
+router.put("/:id", eventController.updateEvent);
 
 /**
  * Route to delete an event.
@@ -45,7 +45,7 @@ router.put("/update/:id", eventController.updateEvent);
  * This route handles DELETE requests to remove an event by its ID.
  * It uses the deleteEvent function from the eventController to process the request.
  */
-router.delete("/delete/:id", eventController.deleteEvent);
+router.delete("/:id", eventController.deleteEvent);
 
 // Export the router to be used in other parts of the application
 module.exports = router;
