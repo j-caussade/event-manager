@@ -1,17 +1,18 @@
 {
   "name": "eventura",
   "version": "1.0.0",
-  "description": "event manager app backend",
-  "main": "app.js",
+  "description": "event manager application",
+  "main": "src/app.js",
   "scripts": {
-    "dev": "nodemon app.js",
+    "dev": "nodemon src/app.js",
     "test": "jest",
-    "prod": "node app.js"
+    "prod": "node src/app.js"
   },
   "author": "Julien Caussade",
   "dependencies": {
     "dotenv": "^17.2.0",
-    "express": "^5.1.0"
+    "express": "^5.1.0",
+    "mysql2": "^3.14.3"
   },
   "devDependencies": {
     "jest": "^30.0.4",

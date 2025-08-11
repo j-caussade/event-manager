@@ -13,6 +13,7 @@ Event management project containerized with Docker and developed in Node.js and 
 - [Contribution guidelines](#contribution-guidelines)
 - [Deploying on VPS](#deploying-on-vps)
 - [CI/CD Pipeline](#ci-cd-pipeline)
+- [Database](#database)
 
 ## Local Installation Procedure
 
@@ -36,7 +37,7 @@ To set up the project locally, follow these steps:
 The project is structured as follows:
 
 - `database/`: Contains the script to create the database for the project.
-- `server/`: Contains the backend part of the project.
+- `src/`: Contains the functional code of the project.
 
 ## Contribution Guidelines
 
@@ -97,3 +98,25 @@ The project uses GitHub Actions for Continuous Integration to test changes befor
 ### Deployment Workflow
 
 The deployment workflow automatically deploys the latest changes from the repository to the VPS. It is triggered by pushes to the `master` branch, ensuring the production environment is kept up-to-date.
+
+## Database
+
+The project uses a MySQL database, which is set up and initialized using SQL scripts. Here's how the database is configured and managed:
+
+### SQL Scripts
+
+- **Schema Script**: Located at `./database/schema.sql`, this script is responsible for creating the database schema, including tables and initial setup. It should be used to set up the database structure.
+
+- **Data Script**: Located at `./database/data.sql`, this script is used to populate the database with initial data. It is executed after the schema script to ensure all tables are properly set up before data insertion.
+
+### Dependencies
+
+The project relies on the following key dependencies for database interactions:
+
+- **MySQL2**: A Node.js driver for MySQL, used for direct database queries and connections. It provides a simple and efficient way to interact with the MySQL database from the Node.js environment.
+
+### Configuration
+
+- **Environment Variables**: The project uses environment variables to manage database configurations. These variables are defined in the `.env` file located at the root of the project directory.
+
+- **Database Connection**: The database connection is managed using MySQL2, a Node.js driver for MySQL. The connection setup can be found in the file `./src/utils/db.js`. This file contains the configuration and logic for connecting to the MySQL database.
