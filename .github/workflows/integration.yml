@@ -34,7 +34,7 @@ jobs:
 
       # Install dependencies and run tests in the specified working directory
       - name: Install dependencies and run tests
-        working-directory: ./server # Specify the directory where the server code is located
+        working-directory: ./src # Specify the directory where the server code is located
         # Command to install project dependencies
         # Command to run tests with additional options
         run: |
