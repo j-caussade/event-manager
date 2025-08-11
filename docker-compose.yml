@@ -24,8 +24,8 @@ services:
     networks:
       - app-network # Connect to a custom network
 
-  # Backend Service
-  backend:
+  # App Service
+  app:
     # Build the Docker image using the Dockerfile in current directory
     build: .
     # Map port 3000 by default or a custom one on the host to port 3000 on the container
