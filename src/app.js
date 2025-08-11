@@ -13,6 +13,7 @@ const cityRoutes = require("./routes/cityRoutes");
 const locationRoutes = require("./routes/locationRoutes");
 const organizeRoutes = require("./routes/organizeRoutes");
 const organizerRoutes = require("./routes/organizerRoutes");
+const postalCodeRoutes = require("./routes/postalCodeRoutes");
 
 // Middleware to parse incoming JSON request bodies
 app.use(express.json());
@@ -37,6 +38,7 @@ app.use("/api/v1/cities", cityRoutes);
 app.use("/api/v1/locations", locationRoutes);
 app.use("/api/v1/organize", organizeRoutes);
 app.use("/api/v1/organizers", organizerRoutes);
+app.use("/api/v1/postal-codes", postalCodeRoutes);
 
 // Export the Express application for potential use in testing or other modules
 module.exports = app;
