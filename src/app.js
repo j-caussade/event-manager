@@ -1,39 +1,48 @@
-// Load environment variables from .env file
+// Load environment variables from the .env file into process.env
 require("dotenv").config();
 
-// Import modules
+// Import the Express module
 const express = require("express");
 
 // Create an instance of an Express application
 const app = express();
 
-// Import routes
+// Import the event routes from the specified route file
 const eventRoutes = require("./routes/eventRoutes");
 
-// Middleware setup
-app.use(express.json()); // Parse JSON request bodies
+// Middleware to parse incoming JSON request bodies
+app.use(express.json());
 
-// Define the port and hostname from environment variables or use defaults
+// Define the port and hostname from environment variables or use default values
 const port = process.env.PORT || 3000;
 const hostname = process.env.HOST || "localhost";
 
-// Define a route for GET requests to the root URL
+/**
+ * Define a route for GET requests to the root URL ("/").
+ *
+ * This route sends a simple greeting message as a response.
+ */
 app.get("/", (req, res) => {
-  // Send a response with a message
+  // Send a response with a greeting message
   res.send("Adishatz moùnde !");
 });
 
-// Routes setup
+// Use the event routes for requests to "/api/v1/events"
 app.use("/api/v1/events", eventRoutes);
 
-// Export the Express application for use in testing
+// Export the Express application for potential use in testing or other modules
 module.exports = app;
 
 // Check if the script is being run directly
 if (require.main === module) {
-  // Start the server on the specified port and hostname
+  /**
+   * Start the server on the specified port and hostname.
+   *
+   * This block of code starts the Express server and logs a message to the console
+   * indicating that the server is running.
+   */
   app.listen(port, hostname, () => {
     // Log a message to the console indicating that the server is running
-    console.log(`App running at http://${hostname}:${port}`);
+    console.log(`Server running at http://${hostname}:${port}`);
   });
 }
