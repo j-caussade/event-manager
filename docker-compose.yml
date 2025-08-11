@@ -26,11 +26,11 @@ services:
 
   # Backend Service
   backend:
-    # Build the Docker image using the Dockerfile in ./server directory
-    build: ./server
+    # Build the Docker image using the Dockerfile in current directory
+    build: .
     # Map port 3000 by default or a custom one on the host to port 3000 on the container
     ports:
-      - "${BACKEND_PORT:-3000}:3000"
+      - "${PORT:-3000}:3000"
     # Environment variables for backend service
     # These variables are loaded from the .env file for security and configuration management
     environment:
@@ -40,7 +40,7 @@ services:
       DB_PASSWORD: ${DB_PASSWORD} # Database password (matches the MYSQL_PASSWORD above)
       DB_NAME: ${DB_NAME} # Database name (matches the MYSQL_DATABASE above)
     volumes:
-      - ./server:/usr/src/app # Syncs local ./server directory with container's /usr/src/app for live updates
+      - .:/usr/src/app # Syncs local directory with container's /usr/src/app for live updates
     # Ensure that the db service is started before this service
     depends_on:
       - db

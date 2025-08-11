@@ -110,7 +110,7 @@ The project uses a MySQL database, which is set up and initialized using SQL scr
 
 ### Configuration
 
-- **Environment Variables**: The project uses environment variables to manage database configurations. These variables are defined in the `./eventura/.env` file and are mirrored in the `./eventura/server/.env` file to ensure consistency across different parts of the application.
+- **Environment Variables**: The project uses environment variables to manage database configurations. These variables are defined in the `./eventura/.env`.
 
 - **Dependencies**:
   The project relies on the following key dependencies for database interactions:
