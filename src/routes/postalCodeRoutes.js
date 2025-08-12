@@ -1,9 +1,14 @@
 // Import the Express module
 const express = require("express");
+
 // Create a new router object to handle routes
 const router = express.Router();
+
 // Import the postalCode controller which contains the logic for handling postal code-related requests
 const postalCodeController = require("../controllers/postalCodeController");
+
+// Import the authentication and authorization middleware
+const { authenticate, authorize } = require("../middlewares/authMiddleware");
 
 /**
  * Route to create a new postal code.
@@ -11,7 +16,12 @@ const postalCodeController = require("../controllers/postalCodeController");
  * This route handles POST requests to create a new postal code.
  * It uses the createPostalCode function from the postalCodeController to process the request.
  */
-router.post("/", postalCodeController.createPostalCode);
+router.post(
+  "/",
+  authenticate,
+  authorize(1),
+  postalCodeController.createPostalCode
+);
 
 /**
  * Route to get all postal codes.
@@ -35,7 +45,12 @@ router.get("/:id", postalCodeController.getPostalCodeById);
  * This route handles PUT requests to update an existing postal code by its ID.
  * It uses the updatePostalCode function from the postalCodeController to process the request.
  */
-router.put("/:id", postalCodeController.updatePostalCode);
+router.put(
+  "/:id",
+  authenticate,
+  authorize(1),
+  postalCodeController.updatePostalCode
+);
 
 /**
  * Route to delete a postal code.
@@ -43,7 +58,12 @@ router.put("/:id", postalCodeController.updatePostalCode);
  * This route handles DELETE requests to remove a postal code by its ID.
  * It uses the deletePostalCode function from the postalCodeController to process the request.
  */
-router.delete("/:id", postalCodeController.deletePostalCode);
+router.delete(
+  "/:id",
+  authenticate,
+  authorize(1),
+  postalCodeController.deletePostalCode
+);
 
 // Export the router to be used in other parts of the application
 module.exports = router;

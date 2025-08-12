@@ -7,7 +7,7 @@ const express = require("express");
 // Create an instance of an Express application
 const app = express();
 
-// Import routes from the specified route file
+// Import routes from the specified route files
 const eventRoutes = require("./routes/eventRoutes");
 const cityRoutes = require("./routes/cityRoutes");
 const locationRoutes = require("./routes/locationRoutes");
@@ -16,6 +16,7 @@ const organizerRoutes = require("./routes/organizerRoutes");
 const postalCodeRoutes = require("./routes/postalCodeRoutes");
 const registerRoutes = require("./routes/registerRoutes");
 const userRoutes = require("./routes/userRoutes");
+const authRoutes = require("./routes/authRoutes");
 
 // Middleware to parse incoming JSON request bodies
 app.use(express.json());
@@ -28,13 +29,20 @@ const hostname = process.env.HOST || "localhost";
  * Define a route for GET requests to the root URL ("/").
  *
  * This route sends a simple greeting message as a response.
+ *
+ * @name get/
+ * @function
+ * @memberof module:app
+ * @inner
+ * @param {string} path - Express path "/"
+ * @param {callback} middleware - Middleware function to handle the request
  */
 app.get("/", (req, res) => {
   // Send a response with a greeting message
   res.send("Adishatz moùnde !");
 });
 
-// Use routes for requests to "/api/v1/:name"
+// Use routes for requests to "/api/v1/:resource"
 app.use("/api/v1/events", eventRoutes);
 app.use("/api/v1/cities", cityRoutes);
 app.use("/api/v1/locations", locationRoutes);
@@ -43,6 +51,7 @@ app.use("/api/v1/organizers", organizerRoutes);
 app.use("/api/v1/postal-codes", postalCodeRoutes);
 app.use("/api/v1/register", registerRoutes);
 app.use("/api/v1/users", userRoutes);
+app.use("/api/v1/auth", authRoutes);
 
 // Export the Express application for potential use in testing or other modules
 module.exports = app;
