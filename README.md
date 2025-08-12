@@ -14,6 +14,7 @@ Event management project containerized with Docker and developed in Node.js and 
 - [Deploying on VPS](#deploying-on-vps)
 - [CI/CD Pipeline](#ci-cd-pipeline)
 - [Database](#database)
+- [Authentication](#authentication)
 
 ## Local Installation Procedure
 
@@ -34,10 +35,19 @@ To set up the project locally, follow these steps:
 
 ## Project Architecture Overview
 
-The project is structured as follows:
+The project is structured with a focus on modularity and separation of concerns. Here's an overview of the key directories and their functions:
 
-- `database/`: Contains the script to create the database for the project.
-- `src/`: Contains the functional code of the project.
+- `./.github/`: Contains the workflow files for the CI/CD pipeline, which automate the testing and deployment processes.
+
+- `./database/`: Contains the scripts to create and populate the project database when launching containers.
+
+- `./src/`: This directory contains the main logic of the application and is organized into several sub-directories:
+  - `app.js`: The main application file that initializes the Express server and connects different parts of the application.
+  - `controllers/`: Contains the controllers responsible for managing the business logic of the application.
+  - `middlewares/`: Includes middleware functions, such as `authMiddleware.js`, used to process requests before they reach controllers.
+  - `routes/`: Defines the application routes, responsible for directing HTTP requests to appropriate controller functions.
+  - `services/`: Contains service modules that encapsulate business logic and data processing.
+  - `utils/`: Utility functions and helpers, including `db.js` for managing database connections.
 
 ## Contribution Guidelines
 
@@ -120,3 +130,17 @@ The project relies on the following key dependencies for database interactions:
 - **Environment Variables**: The project uses environment variables to manage database configurations. These variables are defined in the `.env` file located at the root of the project directory.
 
 - **Database Connection**: The database connection is managed using MySQL2, a Node.js driver for MySQL. The connection setup can be found in the file `./src/utils/db.js`. This file contains the configuration and logic for connecting to the MySQL database.
+
+## Authentication
+
+The authentication system is designed to secure access to certain routes and ensure that only authorized users can perform specific actions. The system utilizes the following key components:
+
+- **Packages**: `bcrypt` for password hashing and `jsonwebtoken` for generating and verifying JSON Web Tokens (JWT).
+
+- **Services**: Authentication services handle the core logic of user registration, login, and token management. These services interact with the database to validate user credentials and manage sessions.
+
+- **Controllers**: Authentication controllers manage incoming requests related to user authentication, such as login and registration. They use services to process these requests and send appropriate responses.
+
+- **Routes**: Specific routes are defined for authentication purposes, including endpoints for user registration and login. These routes are linked to their respective controller functions.
+
+- **Middleware**: Authentication middleware is used to protect certain routes. It checks for valid JWT tokens in incoming requests and ensures that only authenticated and authorized users can access protected endpoints.
