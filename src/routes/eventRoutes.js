@@ -41,6 +41,7 @@ router.post("/", authenticate, authorize(1), eventController.createEvent);
  * @memberof module:routers/eventRouter
  * @inner
  * @param {string} path - Express path "/"
+ * @param {callback} middleware - Middleware to authenticate and authorize the request
  * @param {callback} controller - Controller function to handle retrieving all events
  */
 router.get("/", authenticate, authorize(1), eventController.getAllEvents);

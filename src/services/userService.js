@@ -1,3 +1,9 @@
+/**
+ * @fileoverview This file contains the service functions for handling database operations related to users.
+ * It includes functions for creating, retrieving, updating, and deleting users.
+ * Each function interacts with the database to perform the necessary operations.
+ */
+
 // Import the database connection pool from the utils directory
 const { pool } = require("../utils/db");
 
@@ -5,9 +11,15 @@ const { pool } = require("../utils/db");
  * Creates a new user in the database.
  *
  * This function inserts a new user into the database using the provided user data.
+ * The user data should include all required fields for the users table.
  *
  * @param {Object} userData - The data of the user to be created.
- * @returns {number} The ID of the newly created user.
+ * @param {string} userData.user_first_name - The first name of the user.
+ * @param {string} userData.user_last_name - The last name of the user.
+ * @param {string} userData.user_email - The email of the user.
+ * @param {string} userData.user_password - The password of the user (should be hashed before insertion).
+ * @param {boolean} [userData.user_is_admin] - Whether the user is an admin (defaults to false if not provided).
+ * @returns {Promise<number>} The ID of the newly created user.
  * @throws {Error} Throws an error if the database operation fails.
  */
 const createUser = async (userData) => {
@@ -27,8 +39,9 @@ const createUser = async (userData) => {
  * Retrieves all users from the database.
  *
  * This function fetches all users stored in the database.
+ * The returned user objects include all fields from the users table.
  *
- * @returns {Array} An array of user objects.
+ * @returns {Promise<Array>} An array of user objects.
  * @throws {Error} Throws an error if the database operation fails.
  */
 const getAllUsers = async () => {
@@ -45,17 +58,18 @@ const getAllUsers = async () => {
 };
 
 /**
- * Retrieves a specific user by its ID from the database.
+ * Retrieves a specific user by their ID from the database.
  *
  * This function fetches a single user based on the provided user ID.
+ * The returned user object includes all fields from the users table.
  *
  * @param {number} userId - The ID of the user to retrieve.
- * @returns {Object} The user object.
+ * @returns {Promise<Object>} The user object, or undefined if no user was found.
  * @throws {Error} Throws an error if the database operation fails.
  */
 const getUserById = async (userId) => {
   try {
-    // Execute the SQL query to select a user by its ID from the database
+    // Execute the SQL query to select a user by their ID from the database
     const [rows] = await pool.query("SELECT * FROM users WHERE user_id = ?", [
       userId,
     ]);
@@ -72,9 +86,15 @@ const getUserById = async (userId) => {
  * Updates an existing user in the database.
  *
  * This function updates a user's data based on the provided user ID and new user data.
+ * Only the fields provided in userData will be updated.
  *
  * @param {number} userId - The ID of the user to update.
  * @param {Object} userData - The new data for the user.
+ * @param {string} [userData.user_first_name] - The first name of the user.
+ * @param {string} [userData.user_last_name] - The last name of the user.
+ * @param {string} [userData.user_email] - The email of the user.
+ * @param {string} [userData.user_password] - The password of the user (should be hashed before update).
+ * @param {boolean} [userData.user_is_admin] - Whether the user is an admin.
  * @throws {Error} Throws an error if the database operation fails.
  */
 const updateUser = async (userId, userData) => {
@@ -95,6 +115,7 @@ const updateUser = async (userId, userData) => {
  * Deletes a user from the database.
  *
  * This function removes a user from the database based on the provided user ID.
+ * This operation is irreversible and will permanently delete the user record.
  *
  * @param {number} userId - The ID of the user to delete.
  * @throws {Error} Throws an error if the database operation fails.
