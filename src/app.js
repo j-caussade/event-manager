@@ -1,3 +1,9 @@
+/**
+ * @fileoverview This file is the main entry point for the Express application.
+ * It configures the Express app, sets up middleware, and defines routes.
+ * The server is started here, listening on a specified port and hostname.
+ */
+
 // Load environment variables from the .env file into process.env
 require("dotenv").config();
 

@@ -1,3 +1,9 @@
+/**
+ * @fileoverview This file sets up a connection pool to a MySQL database using the mysql2/promise module.
+ * It provides functionality to create and manage database connections efficiently using a pool.
+ * This approach allows for better performance and resource management by reusing connections.
+ */
+
 // Import the mysql2/promise module to use MySQL with promises for easier asynchronous handling
 const mysql = require("mysql2/promise");
 
