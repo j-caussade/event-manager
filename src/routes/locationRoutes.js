@@ -7,13 +7,16 @@ const router = express.Router();
 // Import the location controller which contains the logic for handling location-related requests
 const locationController = require("../controllers/locationController");
 
+// Import the authentication and authorization middleware
+const { authenticate, authorize } = require("../middlewares/authMiddleware");
+
 /**
  * Route to create a new location.
  *
  * This route handles POST requests to create a new location.
  * It uses the createLocation function from the locationController to process the request.
  */
-router.post("/", locationController.createLocation);
+router.post("/", authenticate, authorize(1), locationController.createLocation);
 
 /**
  * Route to get all locations.
@@ -37,7 +40,12 @@ router.get("/:id", locationController.getLocationById);
  * This route handles PUT requests to update an existing location by its ID.
  * It uses the updateLocation function from the locationController to process the request.
  */
-router.put("/:id", locationController.updateLocation);
+router.put(
+  "/:id",
+  authenticate,
+  authorize(1),
+  locationController.updateLocation
+);
 
 /**
  * Route to delete a location.
@@ -45,7 +53,12 @@ router.put("/:id", locationController.updateLocation);
  * This route handles DELETE requests to remove a location by its ID.
  * It uses the deleteLocation function from the locationController to process the request.
  */
-router.delete("/:id", locationController.deleteLocation);
+router.delete(
+  "/:id",
+  authenticate,
+  authorize(1),
+  locationController.deleteLocation
+);
 
 // Export the router to be used in other parts of the application
 module.exports = router;

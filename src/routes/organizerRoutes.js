@@ -1,9 +1,14 @@
 // Import the Express module
 const express = require("express");
+
 // Create a new router object to handle routes
 const router = express.Router();
+
 // Import the organizer controller which contains the logic for handling organizer-related requests
 const organizerController = require("../controllers/organizerController");
+
+// Import the authentication and authorization middleware
+const { authenticate, authorize } = require("../middlewares/authMiddleware");
 
 /**
  * Route to create a new organizer.
@@ -11,7 +16,12 @@ const organizerController = require("../controllers/organizerController");
  * This route handles POST requests to create a new organizer.
  * It uses the createOrganizer function from the organizerController to process the request.
  */
-router.post("/", organizerController.createOrganizer);
+router.post(
+  "/",
+  authenticate,
+  authorize(1),
+  organizerController.createOrganizer
+);
 
 /**
  * Route to get all organizers.
@@ -35,7 +45,12 @@ router.get("/:id", organizerController.getOrganizerById);
  * This route handles PUT requests to update an existing organizer by its ID.
  * It uses the updateOrganizer function from the organizerController to process the request.
  */
-router.put("/:id", organizerController.updateOrganizer);
+router.put(
+  "/:id",
+  authenticate,
+  authorize(1),
+  organizerController.updateOrganizer
+);
 
 /**
  * Route to delete an organizer.
@@ -43,7 +58,12 @@ router.put("/:id", organizerController.updateOrganizer);
  * This route handles DELETE requests to remove an organizer by its ID.
  * It uses the deleteOrganizer function from the organizerController to process the request.
  */
-router.delete("/:id", organizerController.deleteOrganizer);
+router.delete(
+  "/:id",
+  authenticate,
+  authorize(1),
+  organizerController.deleteOrganizer
+);
 
 // Export the router to be used in other parts of the application
 module.exports = router;
