@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS users (
     user_first_name     VARCHAR(50)     NOT NULL,
     user_last_name      VARCHAR(50)     NOT NULL,
     user_email          VARCHAR(320)    NOT NULL, -- unique
-    user_password       VARCHAR(50)     NOT NULL,
+    user_password       VARCHAR(255)    NOT NULL,
     user_is_admin       BOOLEAN         NOT NULL DEFAULT FALSE,
     PRIMARY KEY (user_id),
     UNIQUE (user_email)
