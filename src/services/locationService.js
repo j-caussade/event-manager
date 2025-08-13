@@ -1,5 +1,5 @@
 // Import the database connection pool from the utils directory
-const { pool } = require("../utils/db");
+const { pool } = require("../utils/dbUtils");
 
 /**
  * Creates a new location in the database.

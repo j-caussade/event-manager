@@ -7,7 +7,7 @@
 // Import the dotenv module for environment variable configuration
 require("dotenv").config();
 // Import the database connection pool from the utils directory
-const { pool } = require("../utils/db");
+const { pool } = require("../utils/dbUtils");
 // Import bcrypt for password hashing
 const bcrypt = require("bcrypt");
 // Import jsonwebtoken for token generation
@@ -58,18 +58,17 @@ const registerUser = async (userData) => {
  * This function checks if the user exists and if the password is valid,
  * then generates a JSON Web Token with the user's ID and role.
  *
- * @param {Object} userData - The user data for login.
- * @param {string} userData.user_email - The email of the user.
- * @param {string} userData.user_password - The password of the user.
+ * @param {string} user_email - The email of the user.
+ * @param {string} user_password - The password of the user.
  * @returns {Promise<string>} The JSON Web Token for the authenticated user.
  * @throws {Error} Throws an error if the user is not found or if the password is invalid.
  */
-const loginUser = async (userData) => {
+const loginUser = async (user_email, user_password) => {
   try {
     // Retrieve the user from the database by email
     const [rows] = await pool.query(
       "SELECT * FROM users WHERE user_email = ?",
-      [userData.user_email]
+      [user_email]
     );
     // If no user is found, throw an error
     if (rows.length === 0) {
@@ -77,12 +76,8 @@ const loginUser = async (userData) => {
     }
     // Check if the provided password matches the stored hashed password
     const user = rows[0];
-    const isMatch = await bcrypt.compare(
-      userData.user_password,
-      user.user_password
-    );
+    const isMatch = await bcrypt.compare(user_password, user.user_password);
     if (!isMatch) {
-      // If the password is invalid, throw an error
       throw new Error("Invalid credentials");
     }
     // Generate and return a JSON Web Token

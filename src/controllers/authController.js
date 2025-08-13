@@ -81,30 +81,17 @@ const login = async (req, res) => {
     // Extract user_email and user_password from the request body
     const { user_email, user_password } = req.body;
     // Call the loginUser method from authService to authenticate the user
-    const user = await authService.loginUser(user_email, user_password);
-    // Generate a token (this would typically be done in the service, but included here for completeness)
-    // In a real implementation, the service would return the token directly
-    // const token = generateToken(user);
-    // Send a success response with the user data (excluding sensitive information)
+    const token = await authService.loginUser(user_email, user_password);
+    // Send a success response with the JWT
     res.json({
       message: "Login successful",
-      user: {
-        userId: user.user_id,
-        firstName: user.user_first_name,
-        lastName: user.user_last_name,
-        email: user.user_email,
-        isAdmin: user.user_is_admin,
-      },
-      // token: token // Uncomment if using token-based authentication
+      token: token,
     });
   } catch (error) {
     // Log the error for debugging purposes
     console.error("Login error:", error);
     // Handle specific error cases
-    if (error.message === "User not found.") {
-      return res.status(404).json({ error: "User not found" });
-    }
-    if (error.message === "Invalid password.") {
+    if (error.message === "Invalid credentials") {
       return res.status(401).json({ error: "Invalid credentials" });
     }
     // If an error occurs, send an error response with status code 500 (Internal Server Error)

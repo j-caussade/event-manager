@@ -27,7 +27,7 @@ const authRoutes = require("./routes/authRoutes");
 // Middleware to parse incoming JSON request bodies
 app.use(express.json());
 
-// Define the port and hostname from environment variables or use default values
+// Define port and hostname from environment variables or use default values
 const port = process.env.PORT || 3000;
 const hostname = process.env.HOST || "localhost";
 
@@ -67,8 +67,8 @@ if (require.main === module) {
   /**
    * Start the server on the specified port and hostname.
    *
-   * This block of code starts the Express server and logs a message to the console
-   * indicating that the server is running.
+   * This block of code starts the Express server and logs a message to the
+   * console indicating that the server is running.
    */
   app.listen(port, hostname, () => {
     // Log a message to the console indicating that the server is running

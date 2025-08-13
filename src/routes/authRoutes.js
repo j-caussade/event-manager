@@ -43,43 +43,15 @@ router.post("/register", authController.register);
  * @param {Object} req.body - User login credentials
  * @param {string} req.body.user_email.required - User's email address
  * @param {string} req.body.user_password.required - User's password
- * @returns {Object} 200 - Login successful with user data (excluding password)
+ * @returns {Object} 200 - Login successful with JWT token
  * @returns {Object} 400 - Bad request (missing credentials)
  * @returns {Object} 401 - Unauthorized (invalid credentials)
- * @returns {Object} 404 - User not found
  * @returns {Object} 500 - Internal server error
  *
  * @description This route authenticates users by verifying their email and password.
- * On successful authentication, it returns user data (excluding sensitive information).
+ * On successful authentication, it returns a JWT token.
  */
 router.post("/login", authController.login);
-
-/**
- * Protected route example.
- *
- * @route GET /protected
- * @group Authentication - Operations related to user authentication
- * @security JWT - Requires a valid JWT token with admin privileges
- * @returns {Object} 200 - Success message confirming access to protected route
- * @returns {Object} 401 - Unauthorized (missing or invalid token)
- * @returns {Object} 403 - Forbidden (user doesn't have admin privileges)
- * @returns {Object} 500 - Internal server error
- *
- * @description This is an example of a protected route that requires both authentication
- * and admin privileges to access. It demonstrates how to secure routes using the
- * authentication and authorization middleware.
- */
-router.get(
-  "/protected",
-  authenticate, // Requires valid authentication token
-  authorize(true), // Requires admin privileges (true represents admin)
-  (req, res) => {
-    res.send({
-      message:
-        "This is a protected route, accessible only to authenticated admin users",
-    });
-  }
-);
 
 // Export the router to be used in the main application
 module.exports = router;
