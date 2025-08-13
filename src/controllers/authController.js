@@ -99,8 +99,57 @@ const login = async (req, res) => {
   }
 };
 
+/**
+ * Handles a user password change request.
+ *
+ * This function processes a request to change a user's password by verifying the current password,
+ * then updating it with the new one if the verification is successful.
+ *
+ * @param {Object} req - The request object containing the user's ID (from JWT), current password, and new password in the body.
+ * @param {number} req.user.id - The ID of the user (extracted from the JWT).
+ * @param {string} req.body.currentPassword - The current password of the user.
+ * @param {string} req.body.newPassword - The new password to set.
+ * @param {Object} res - The response object used to send back a success message or an error message.
+ * @returns {Object} A JSON object with a success message or an error message.
+ */
+const changePassword = async (req, res) => {
+  try {
+    // Validate that all required fields are present in the request body
+    if (!req.body.currentPassword || !req.body.newPassword) {
+      return res
+        .status(400)
+        .json({ error: "Current password and new password are required" });
+    }
+    // Extract user ID from the JWT (assuming it's attached to req.user by a previous middleware)
+    const userId = req.user.id;
+    // Extract current and new passwords from the request body
+    const { currentPassword, newPassword } = req.body;
+    // Call the changePassword method from authService to update the password
+    await authService.changePassword(userId, currentPassword, newPassword);
+    // Send a success response
+    res.json({
+      message: "Password changed successfully",
+    });
+  } catch (error) {
+    // Log the error for debugging purposes
+    console.error("Change password error:", error);
+    // Handle specific error cases
+    if (error.message === "User not found") {
+      return res.status(404).json({ error: "User not found" });
+    }
+    if (error.message === "Current password is incorrect") {
+      return res.status(401).json({ error: "Current password is incorrect" });
+    }
+    // If an error occurs, send an error response with status code 500 (Internal Server Error)
+    res
+      .status(500)
+      .json({ error: "Failed to change password. Please try again later." });
+  }
+};
+
 // Export the register and login functions
 module.exports = {
   register,
   login,
+  changePassword,
 };

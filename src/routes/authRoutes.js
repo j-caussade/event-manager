@@ -53,5 +53,29 @@ router.post("/register", authController.register);
  */
 router.post("/login", authController.login);
 
+/**
+ * Route to handle user password change.
+ *
+ * @route PUT /change-password
+ * @group Authentication - Operations related to user authentication
+ * @param {Object} req.body - Password change data
+ * @param {string} req.body.currentPassword.required - User's current password
+ * @param {string} req.body.newPassword.required - User's new password
+ * @returns {Object} 200 - Password changed successfully
+ * @returns {Object} 400 - Bad request (missing required fields)
+ * @returns {Object} 401 - Unauthorized (current password is incorrect)
+ * @returns {Object} 404 - Not found (user not found)
+ * @returns {Object} 500 - Internal server error
+ *
+ * @description This route allows a logged-in user to change their password.
+ * The user must provide their current password and the new password.
+ * The route is protected and requires a valid JWT token.
+ */
+router.put(
+  "/change-password",
+  authenticate, // Middleware pour vérifier le JWT et attacher req.user
+  authController.changePassword
+);
+
 // Export the router to be used in the main application
 module.exports = router;

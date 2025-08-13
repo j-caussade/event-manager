@@ -94,8 +94,53 @@ const loginUser = async (user_email, user_password) => {
   }
 };
 
+/**
+ * Changes the password of a user after verifying the current password.
+ *
+ * This function checks if the current password provided matches the stored password,
+ * then updates the password with the new one if the check is successful.
+ *
+ * @param {number} userId - The ID of the user.
+ * @param {string} currentPassword - The current password of the user.
+ * @param {string} newPassword - The new password to set.
+ * @returns {Promise<void>} Resolves if the password was successfully changed.
+ * @throws {Error} Throws an error if the current password is invalid or if the database operation fails.
+ */
+const changePassword = async (userId, currentPassword, newPassword) => {
+  try {
+    // Retrieve the user from the database by ID
+    const [rows] = await pool.query(
+      "SELECT user_password FROM users WHERE user_id = ?",
+      [userId]
+    );
+    // If no user is found, throw an error
+    if (rows.length === 0) {
+      throw new Error("User not found");
+    }
+    // Check if the provided current password matches the stored hashed password
+    const user = rows[0];
+    const isMatch = await bcrypt.compare(currentPassword, user.user_password);
+    if (!isMatch) {
+      throw new Error("Current password is incorrect");
+    }
+    // Hash the new password
+    const saltRounds = 10;
+    const hashedNewPassword = await bcrypt.hash(newPassword, saltRounds);
+    // Update the user's password in the database
+    await pool.query("UPDATE users SET user_password = ? WHERE user_id = ?", [
+      hashedNewPassword,
+      userId,
+    ]);
+  } catch (error) {
+    // Log the error and re-throw it to be handled by the calling function
+    console.error("Error changing password:", error);
+    throw error;
+  }
+};
+
 // Export the service functions to be used in other parts of the application
 module.exports = {
   registerUser,
   loginUser,
+  changePassword,
 };
