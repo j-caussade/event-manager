@@ -1,13 +1,23 @@
+/**
+ * @fileoverview Service functions for handling database operations related to locations.
+ * Provides CRUD (Create, Read, Update, Delete) operations for the 'locations' table.
+ * Uses a MySQL connection pool for efficient database interaction.
+ */
+
 // Import the database connection pool from the utils directory
-const { pool } = require("../utils/db");
+const { pool } = require("../utils/dbUtils");
 
 /**
  * Creates a new location in the database.
  *
- * This function inserts a new location into the database using the provided location data.
- *
+ * @async
+ * @function createLocation
  * @param {Object} locationData - The data of the location to be created.
- * @returns {number} The ID of the newly created location.
+ * @param {string} locationData.location_name - Name of the location.
+ * @param {number} locationData.postal_code_id - ID of the associated postal code.
+ * @param {number} locationData.city_id - ID of the associated city.
+ * @param {string} [locationData.location_address] - Address of the location (optional).
+ * @returns {Promise<number>} The ID of the newly created location.
  * @throws {Error} Throws an error if the database operation fails.
  */
 const createLocation = async (locationData) => {
@@ -29,9 +39,9 @@ const createLocation = async (locationData) => {
 /**
  * Retrieves all locations from the database.
  *
- * This function fetches all locations stored in the database.
- *
- * @returns {Array} An array of location objects.
+ * @async
+ * @function getAllLocations
+ * @returns {Promise<Array<Object>>} An array of location objects.
  * @throws {Error} Throws an error if the database operation fails.
  */
 const getAllLocations = async () => {
@@ -50,10 +60,10 @@ const getAllLocations = async () => {
 /**
  * Retrieves a specific location by its ID from the database.
  *
- * This function fetches a single location based on the provided location ID.
- *
+ * @async
+ * @function getLocationById
  * @param {number} locationId - The ID of the location to retrieve.
- * @returns {Object} The location object.
+ * @returns {Promise<Object|null>} The location object if found, otherwise null.
  * @throws {Error} Throws an error if the database operation fails.
  */
 const getLocationById = async (locationId) => {
@@ -64,7 +74,7 @@ const getLocationById = async (locationId) => {
       [locationId]
     );
     // Return the first location found (should be the only one if location_id is unique)
-    return rows[0];
+    return rows[0] || null;
   } catch (error) {
     // Log the error and re-throw it to be handled by the calling function
     console.error("Error while retrieving location:", error);
@@ -75,8 +85,8 @@ const getLocationById = async (locationId) => {
 /**
  * Updates an existing location in the database.
  *
- * This function updates a location's data based on the provided location ID and new location data.
- *
+ * @async
+ * @function updateLocation
  * @param {number} locationId - The ID of the location to update.
  * @param {Object} locationData - The new data for the location.
  * @throws {Error} Throws an error if the database operation fails.
@@ -98,8 +108,8 @@ const updateLocation = async (locationId, locationData) => {
 /**
  * Deletes a location from the database.
  *
- * This function removes a location from the database based on the provided location ID.
- *
+ * @async
+ * @function deleteLocation
  * @param {number} locationId - The ID of the location to delete.
  * @throws {Error} Throws an error if the database operation fails.
  */
@@ -116,7 +126,15 @@ const deleteLocation = async (locationId) => {
   }
 };
 
-// Export the service functions to be used in other parts of the application
+/**
+ * Exports the service functions for use in other parts of the application.
+ * @module services/organizerService
+ * @property {Function} createLocation - Creates a new location.
+ * @property {Function} getAllLocations - Retrieves all locations.
+ * @property {Function} getLocationById - Retrieves a location by ID.
+ * @property {Function} updateLocation - Updates a location.
+ * @property {Function} deleteLocation - Deletes a location.
+ */
 module.exports = {
   createLocation,
   getAllLocations,

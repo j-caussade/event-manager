@@ -1,69 +1,89 @@
-// Import the Express module
+/**
+ * @fileoverview Routes for organizer-related operations.
+ * Defines RESTful endpoints for creating, retrieving, updating, and deleting organizers.
+ * Uses Express Router for route handling and integrates authentication/authorization middleware.
+ */
+
+// Import the Express module to create and manage routes
 const express = require("express");
-
-// Create a new router object to handle routes
+// Create a new router object to define organizer-specific routes
 const router = express.Router();
-
-// Import the organizer controller which contains the logic for handling organizer-related requests
+// Import the organizer controller, which contains the business logic for organizer operations
 const organizerController = require("../controllers/organizerController");
-
-// Import the authentication and authorization middleware
+// Import authentication and authorization middleware to secure routes
 const { authenticate, authorize } = require("../middlewares/authMiddleware");
 
 /**
- * Route to create a new organizer.
- *
- * This route handles POST requests to create a new organizer.
- * It uses the createOrganizer function from the organizerController to process the request.
+ * POST /organizers
+ * @route Creates a new organizer.
+ * @access Private (requires authentication and admin privileges)
+ * @param {Object} req.body - Organizer data to be created.
+ * @returns {Object} 201 - The created organizer object.
+ * @throws {401} Unauthorized - If the user is not authenticated.
+ * @throws {403} Forbidden - If the user lacks admin privileges.
  */
 router.post(
   "/",
   authenticate,
-  authorize(1),
+  authorize(1), // Requires admin role (assuming 1 represents admin)
   organizerController.createOrganizer
 );
 
 /**
- * Route to get all organizers.
- *
- * This route handles GET requests to retrieve all organizers.
- * It uses the getAllOrganizers function from the organizerController to process the request.
+ * GET /organizers
+ * @route Retrieves all organizers.
+ * @access Public (no authentication required)
+ * @returns {Array<Object>} 200 - An array of organizer objects.
  */
 router.get("/", organizerController.getAllOrganizers);
 
 /**
- * Route to get a specific organizer by ID.
- *
- * This route handles GET requests to retrieve a specific organizer by its ID.
- * It uses the getOrganizerById function from the organizerController to process the request.
+ * GET /organizers/:id
+ * @route Retrieves a specific organizer by ID.
+ * @access Public (no authentication required)
+ * @param {string} req.params.id - The ID of the organizer to retrieve.
+ * @returns {Object} 200 - The organizer object matching the provided ID.
+ * @throws {404} NotFound - If no organizer matches the provided ID.
  */
 router.get("/:id", organizerController.getOrganizerById);
 
 /**
- * Route to update an existing organizer.
- *
- * This route handles PUT requests to update an existing organizer by its ID.
- * It uses the updateOrganizer function from the organizerController to process the request.
+ * PUT /organizers/:id
+ * @route Updates an existing organizer by ID.
+ * @access Private (requires authentication and admin privileges)
+ * @param {string} req.params.id - The ID of the organizer to update.
+ * @param {Object} req.body - Updated organizer data.
+ * @returns {Object} 200 - The updated organizer object.
+ * @throws {401} Unauthorized - If the user is not authenticated.
+ * @throws {403} Forbidden - If the user lacks admin privileges.
+ * @throws {404} NotFound - If no organizer matches the provided ID.
  */
 router.put(
   "/:id",
   authenticate,
-  authorize(1),
+  authorize(1), // Requires admin role
   organizerController.updateOrganizer
 );
 
 /**
- * Route to delete an organizer.
- *
- * This route handles DELETE requests to remove an organizer by its ID.
- * It uses the deleteOrganizer function from the organizerController to process the request.
+ * DELETE /organizers/:id
+ * @route Deletes an organizer by ID.
+ * @access Private (requires authentication and admin privileges)
+ * @param {string} req.params.id - The ID of the organizer to delete.
+ * @returns {Object} 200 - A success message or the deleted organizer object.
+ * @throws {401} Unauthorized - If the user is not authenticated.
+ * @throws {403} Forbidden - If the user lacks admin privileges.
+ * @throws {404} NotFound - If no organizer matches the provided ID.
  */
 router.delete(
   "/:id",
   authenticate,
-  authorize(1),
+  authorize(1), // Requires admin role
   organizerController.deleteOrganizer
 );
 
-// Export the router to be used in other parts of the application
+/**
+ * Exports the router to be mounted in the main application.
+ * @module routes/organizerRoutes
+ */
 module.exports = router;
