@@ -1,13 +1,20 @@
+/**
+ * @fileoverview Service functions for handling database operations related to organizers.
+ * Provides CRUD operations and other business logic for the organizers entity.
+ */
+
 // Import the database connection pool from the utils directory
 const { pool } = require("../utils/dbUtils");
 
 /**
  * Creates a new organizer in the database.
- *
- * This function inserts a new organizer into the database using the provided organizer data.
- *
- * @param {Object} organizerData - The data of the organizer to be created.
- * @returns {number} The ID of the newly created organizer.
+ * @async
+ * @function createOrganizer
+ * @param {Object} organizerData - The organizer data to be inserted.
+ * @param {string} organizerData.organizer_name - Name of the organizer.
+ * @param {string} [organizerData.organizer_description] - Optional description of the organizer.
+ * @param {string} [organizerData.organizer_contact] - Optional contact information.
+ * @returns {Promise<number>} The ID of the newly created organizer.
  * @throws {Error} Throws an error if the database operation fails.
  */
 const createOrganizer = async (organizerData) => {
@@ -28,10 +35,9 @@ const createOrganizer = async (organizerData) => {
 
 /**
  * Retrieves all organizers from the database.
- *
- * This function fetches all organizers stored in the database.
- *
- * @returns {Array} An array of organizer objects.
+ * @async
+ * @function getAllOrganizers
+ * @returns {Promise<Array<Object>>} An array of organizer objects.
  * @throws {Error} Throws an error if the database operation fails.
  */
 const getAllOrganizers = async () => {
@@ -49,11 +55,10 @@ const getAllOrganizers = async () => {
 
 /**
  * Retrieves a specific organizer by its ID from the database.
- *
- * This function fetches a single organizer based on the provided organizer ID.
- *
+ * @async
+ * @function getOrganizerById
  * @param {number} organizerId - The ID of the organizer to retrieve.
- * @returns {Object} The organizer object.
+ * @returns {Promise<Object|null>} The organizer object if found, otherwise null.
  * @throws {Error} Throws an error if the database operation fails.
  */
 const getOrganizerById = async (organizerId) => {
@@ -64,7 +69,7 @@ const getOrganizerById = async (organizerId) => {
       [organizerId]
     );
     // Return the first organizer found (should be the only one if organizer_id is unique)
-    return rows[0];
+    return rows.length > 0 ? rows[0] : null;
   } catch (error) {
     // Log the error and re-throw it to be handled by the calling function
     console.error("Error while retrieving organizer:", error);
@@ -74,11 +79,13 @@ const getOrganizerById = async (organizerId) => {
 
 /**
  * Updates an existing organizer in the database.
- *
- * This function updates an organizer's data based on the provided organizer ID and new organizer data.
- *
+ * @async
+ * @function updateOrganizer
  * @param {number} organizerId - The ID of the organizer to update.
  * @param {Object} organizerData - The new data for the organizer.
+ * @param {string} [organizerData.organizer_name] - Updated name of the organizer.
+ * @param {string} [organizerData.organizer_description] - Updated description of the organizer.
+ * @param {string} [organizerData.organizer_contact] - Updated contact information.
  * @throws {Error} Throws an error if the database operation fails.
  */
 const updateOrganizer = async (organizerId, organizerData) => {
@@ -97,9 +104,8 @@ const updateOrganizer = async (organizerId, organizerData) => {
 
 /**
  * Deletes an organizer from the database.
- *
- * This function removes an organizer from the database based on the provided organizer ID.
- *
+ * @async
+ * @function deleteOrganizer
  * @param {number} organizerId - The ID of the organizer to delete.
  * @throws {Error} Throws an error if the database operation fails.
  */
@@ -116,7 +122,11 @@ const deleteOrganizer = async (organizerId) => {
   }
 };
 
-// Export the service functions to be used in other parts of the application
+/**
+ * Exports the service functions for use in other parts of the application.
+ * @module services/organizerService
+ * @exports {Object} An object containing all organizer service functions.
+ */
 module.exports = {
   createOrganizer,
   getAllOrganizers,

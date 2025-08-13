@@ -6,6 +6,8 @@
 
 // Import the userService module which contains the business logic for user operations.
 const userService = require("../services/userService");
+// Import the extractUserIdFromToken function from the jwtUtils module
+const { extractUserIdFromToken } = require("../utils/jwtUtils");
 
 /**
  * Creates a new user.
@@ -136,6 +138,34 @@ const deleteUser = async (req, res) => {
   }
 };
 
+/**
+ * Retrieves only the first name and last name of the authenticated user.
+ *
+ * @param {Object} req - The request object containing the Authorization header.
+ * @param {Object} res - The response object used to send back the user account info or an error message.
+ * @returns {Object} A JSON object with the user's first name and last name, or an error message.
+ */
+const getUserAccount = async (req, res) => {
+  try {
+    // Extract the user ID from the token
+    const userId = extractUserIdFromToken(req);
+    // If the user ID is not found in the token, return an error response
+    if (!userId) {
+      return res
+        .status(401)
+        .json({ error: "Unauthorized: Invalid or missing token" });
+    }
+    // Call the getUserAccount method from userService with the user ID
+    const user = await userService.getUserAccount(userId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 // Export the controller functions to be used in other parts of the application.
 module.exports = {
   createUser,
@@ -143,4 +173,5 @@ module.exports = {
   getUserById,
   updateUser,
   deleteUser,
+  getUserAccount,
 };

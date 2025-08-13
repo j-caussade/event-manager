@@ -1,36 +1,24 @@
 /**
- * @fileoverview This file sets up a connection pool to a MySQL database using the mysql2/promise module.
- * It provides functionality to create and manage database connections efficiently using a pool.
- * This approach allows for better performance and resource management by reusing connections.
+ * @fileoverview Utility functions for managing MySQL database connections.
+ * Provides a connection pool and helper functions to interact with the database efficiently.
+ * Uses mysql2/promise for promise-based asynchronous operations.
  */
-
-// Import the mysql2/promise module to use MySQL with promises for easier asynchronous handling
 const mysql = require("mysql2/promise");
+const dbConfig = require("../config/dbConfig");
 
 /**
- * Create a connection pool to the MySQL database.
- *
- * This pool manages a set of connections to the database, allowing for better performance
- * and resource management. The configuration for the pool is provided through environment variables.
+ * MySQL connection pool.
+ * Manages a set of database connections for better performance and resource utilization.
+ * @type {import('mysql2/promise').Pool}
  */
-const pool = mysql.createPool({
-  host: process.env.DB_HOST, // Database server address
-  user: process.env.DB_USER, // Database username
-  password: process.env.DB_PASSWORD, // Database password
-  database: process.env.DB_NAME, // Database name
-  waitForConnections: true, // Whether to wait for a connection if none are available
-  connectionLimit: 10, // Maximum number of connections in the pool
-  queueLimit: 0, // Maximum number of queued connection requests
-});
+const pool = mysql.createPool(dbConfig);
 
 /**
- * Function to get a connection from the pool.
- *
- * This function retrieves a connection from the connection pool. It is useful for performing
- * database operations within the context of a single connection.
- *
+ * Retrieves a connection from the connection pool.
+ * @async
+ * @function getConnection
  * @returns {Promise<Object>} A promise that resolves to a database connection object.
- * @throws {Error} Throws an error if the connection cannot be established.
+ * @throws {Error} Throws an error if the connection attempt fails.
  */
 const getConnection = async () => {
   try {
@@ -39,12 +27,17 @@ const getConnection = async () => {
     console.log("Connected to the MySQL database");
     return connection;
   } catch (err) {
-    // Log any errors that occur during the connection attempt
+    // Log the error for debugging purposes
     console.error("Error connecting to the database:", err);
     // Re-throw the error to be handled by the calling function
     throw err;
   }
 };
 
-// Export the getConnection function and the pool for use in other parts of the application
+/**
+ * Exports the connection pool and utility functions for use in other modules.
+ * @module utils/dbUtils
+ * @property {Function} getConnection - Function to retrieve a database connection.
+ * @property {import('mysql2/promise').Pool} pool - MySQL connection pool.
+ */
 module.exports = { getConnection, pool };

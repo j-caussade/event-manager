@@ -9,8 +9,8 @@
 // Import the eventService module which contains the business logic for event
 // operations.
 const eventService = require("../services/eventService");
-// Import the extractUserIdFromToken function from the authUtils module
-const { extractUserIdFromToken } = require("../utils/authUtils");
+// Import the extractUserIdFromToken function from the jwtUtils module
+const { extractUserIdFromToken } = require("../utils/jwtUtils");
 
 /**
  * Creates a new event.

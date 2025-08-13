@@ -2,6 +2,8 @@
  * @fileoverview Utility functions for handling JWT tokens and user extraction.
  * This module provides reusable functions to extract and verify user information from JWT tokens.
  */
+
+// Import jsonwebtoken for token verification
 const jwt = require("jsonwebtoken");
 
 /**

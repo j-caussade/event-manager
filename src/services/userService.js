@@ -131,6 +131,31 @@ const deleteUser = async (userId) => {
   }
 };
 
+/**
+ * Retrieves only the first name and last name of a user by their ID.
+ *
+ * @param {number} userId - The ID of the user to retrieve.
+ * @returns {Promise<Object>} An object containing user_first_name and user_last_name, or undefined if no user was found.
+ * @throws {Error} Throws an error if the database operation fails.
+ */
+const getUserAccount = async (userId) => {
+  try {
+    // Vérifie que userId est un nombre valide
+    if (!userId || isNaN(userId)) {
+      throw new Error("Invalid user ID");
+    }
+    // Exécute la requête SQL pour sélectionner uniquement le prénom et le nom
+    const [rows] = await pool.query(
+      "SELECT user_first_name, user_last_name FROM users WHERE user_id = ?",
+      [userId]
+    );
+    return rows[0];
+  } catch (error) {
+    console.error("Error while retrieving user account:", error);
+    throw error;
+  }
+};
+
 // Export the service functions to be used in other parts of the application
 module.exports = {
   createUser,
@@ -138,4 +163,5 @@ module.exports = {
   getUserById,
   updateUser,
   deleteUser,
+  getUserAccount,
 };

@@ -1,12 +1,20 @@
+/**
+ * @fileoverview Service functions for handling database operations related to event registrations.
+ * Provides CRUD operations for user-event registrations, including creation, retrieval, and deletion.
+ */
+
 // Import the database connection pool from the utils directory
 const { pool } = require("../utils/dbUtils");
 
 /**
- * Creates a new registration in the database.
+ * Creates a new registration record in the database.
+ * Links a user to an event by inserting a new row into the 'register' table.
  *
- * @param {number} userId - The ID of the user.
- * @param {number} eventId - The ID of the event.
- * @returns {number} The ID of the newly created registration.
+ * @async
+ * @function createRegister
+ * @param {number} userId - The unique identifier of the user registering for the event.
+ * @param {number} eventId - The unique identifier of the event being registered for.
+ * @returns {Promise<number>} The ID of the newly created registration record.
  * @throws {Error} Throws an error if the database operation fails.
  */
 const createRegister = async (userId, eventId) => {
@@ -25,9 +33,12 @@ const createRegister = async (userId, eventId) => {
 
 /**
  * Retrieves all registrations for a specific event.
+ * Returns an array of registration objects associated with the given event ID.
  *
- * @param {number} eventId - The ID of the event.
- * @returns {Array} An array of registration objects.
+ * @async
+ * @function getRegistrationsByEventId
+ * @param {number} eventId - The unique identifier of the event.
+ * @returns {Promise<Array<Object>>} An array of registration objects.
  * @throws {Error} Throws an error if the database operation fails.
  */
 const getRegistrationsByEventId = async (eventId) => {
@@ -46,9 +57,12 @@ const getRegistrationsByEventId = async (eventId) => {
 
 /**
  * Retrieves all events a specific user is registered for.
+ * Returns an array of registration objects associated with the given user ID.
  *
- * @param {number} userId - The ID of the user.
- * @returns {Array} An array of event objects.
+ * @async
+ * @function getEventsByUserId
+ * @param {number} userId - The unique identifier of the user.
+ * @returns {Promise<Array<Object>>} An array of registration objects.
  * @throws {Error} Throws an error if the database operation fails.
  */
 const getEventsByUserId = async (userId) => {
@@ -66,10 +80,13 @@ const getEventsByUserId = async (userId) => {
 };
 
 /**
- * Deletes a registration from the database.
+ * Deletes a registration record from the database.
+ * Removes the link between a user and an event based on their respective IDs.
  *
- * @param {number} userId - The ID of the user.
- * @param {number} eventId - The ID of the event.
+ * @async
+ * @function deleteRegister
+ * @param {number} userId - The unique identifier of the user.
+ * @param {number} eventId - The unique identifier of the event.
  * @throws {Error} Throws an error if the database operation fails.
  */
 const deleteRegister = async (userId, eventId) => {
@@ -85,6 +102,14 @@ const deleteRegister = async (userId, eventId) => {
   }
 };
 
+/**
+ * Exports all service functions for use in other modules.
+ * @module services/registerService
+ * @property {Function} createRegister - Creates a new registration record.
+ * @property {Function} getRegistrationsByEventId - Retrieves registrations by event ID.
+ * @property {Function} getEventsByUserId - Retrieves events by user ID.
+ * @property {Function} deleteRegister - Deletes a registration record.
+ */
 module.exports = {
   createRegister,
   getRegistrationsByEventId,

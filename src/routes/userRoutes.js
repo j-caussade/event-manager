@@ -15,6 +15,19 @@ const userController = require("../controllers/userController");
 const { authenticate, authorize } = require("../middlewares/authMiddleware");
 
 /**
+ * Route to get the first name and last name of the authenticated user.
+ *
+ * @route GET /account
+ * @group Users - Operations about users
+ * @security JWT - Requires a valid JWT token
+ * @returns {Object} 200 - User account info (first name and last name)
+ * @returns {Object} 401 - Unauthorized (missing or invalid token)
+ * @returns {Object} 404 - User not found
+ * @returns {Object} 500 - Internal server error
+ */
+router.get("/account", authenticate, userController.getUserAccount);
+
+/**
  * Route to create a new user.
  *
  * @route POST /
