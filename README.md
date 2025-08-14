@@ -27,6 +27,8 @@ Event management project containerized with Docker and developed in Node.js and 
 
 ### Setup
 
+chmod +x ./database/init-users.sh
+
 To set up the project locally, follow these steps:
 
 1. **Clone the repository**: Use the `git clone git@github.com:j-caussade/eventura.git` command to clone the project repository. The use of an **SSH key** is mandatory. If you don't have one, follow the [GitHub instructions](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent) to create and add one (use ED25519 type).
