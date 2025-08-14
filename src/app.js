@@ -29,7 +29,7 @@ app.use(express.json());
 
 // Define port and hostname from environment variables or use default values
 const port = process.env.PORT || 3000;
-const hostname = process.env.HOST || "localhost";
+const hostname = process.env.HOST || "0.0.0.0";
 
 /**
  * Define a route for GET requests to the root URL ("/").
