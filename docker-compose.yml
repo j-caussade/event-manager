@@ -1,73 +1,88 @@
-# Define the services/containers to be run
+################################################################################
+# Docker Compose Configuration for Eventura Application
+#
+# This file defines the services, networks, and volumes required to run:
+# - MySQL database
+# - Node.js backend application
+# - phpMyAdmin for database management
+#
+# Environment variables are loaded from the `.env` file.
+################################################################################
+
 services:
-  # Database Service
+  ##############################################################################
+  # Database Service (MySQL 8.0)
+  ##############################################################################
   db:
-    # Use a LTS version of the MySQL official image
     image: mysql:8.0
-    restart: on-failure
-    # Environment variables for MySQL configuration
-    # These variables are loaded from the .env file to keep sensitive data secure
+    restart: on-failure # Restart container if it fails
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD} # Root password for MySQL
-      MYSQL_DATABASE: ${DB_NAME} # Database name to be created
-      MYSQL_USER: ${DB_USER} # Database user
-      MYSQL_PASSWORD: ${DB_PASSWORD} # Password for the database user
-    command: --default-authentication-plugin=mysql_native_password
-    # Map port 3306 by default or a custom one on the host to port 3306 on the container
-    ports:
-      - "${MYSQL_PORT:-3306}:3306"
-
+      # MySQL root and admin credentials
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_USER_PASSWORD}
+      # Application database and user
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
     volumes:
-      - ./database/schema.sql:/docker-entrypoint-initdb.d/1-schema.sql # Mount the SQL schema file to initialize the database
-      - ./database/data.sql:/docker-entrypoint-initdb.d/2-data.sql # Mount the SQL data and seed data files to fill the database
-      - mysql_data:/var/lib/mysql # Persist database data
-    networks:
-      - app-network # Connect to a custom network
-
-  # App Service
-  app:
-    # Build the Docker image using the Dockerfile in current directory
-    build: .
-    # Map port 3000 by default or a custom one on the host to port 3000 on the container
-    ports:
-      - "${PORT:-3000}:3000"
-    # Environment variables for backend service
-    # These variables are loaded from the .env file for security and configuration management
-    environment:
-      NODE_ENV: ${NODE_ENV} # Set the environment to development or production
-      DB_HOST: db # Database service name as host
-      DB_USER: ${DB_USER} # Database user (matches the MYSQL_USER above)
-      DB_PASSWORD: ${DB_PASSWORD} # Database password (matches the MYSQL_PASSWORD above)
-      DB_NAME: ${DB_NAME} # Database name (matches the MYSQL_DATABASE above)
-    volumes:
-      - .:/usr/src/app # Syncs local directory with container's /usr/src/app for live updates
-    # Ensure that the db service is started before this service
-    depends_on:
-      - db
-    # Connect to a custom network to enable communication between containers
+      # Initialize database with schema, data, and database user permissions
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/1-schema.sql
+      - ./database/init-db-users.sh:/docker-entrypoint-initdb.d/2-init-db-users.sh
+      - ./database/data.sql:/docker-entrypoint-initdb.d/4-data.sql
+      # Persist database data
+      - mysql_data:/var/lib/mysql
     networks:
       - app-network
 
+  ##############################################################################
+  # Backend Service (Node.js)
+  ##############################################################################
+  app:
+    build: . # Build the Docker image from the Dockerfile in the current directory
+    ports:
+      - "${PORT:-3000}:3000" # Map host port to container port (default: 3000)
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      DB_HOST: db # Use the 'db' service name as hostname
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+    volumes:
+      - .:/usr/src/app # Mount the current directory for live code reloading
+    depends_on:
+      - db # Wait for the database to be ready before starting
+    networks:
+      - app-network
+
+  ##############################################################################
   # phpMyAdmin Service
+  ##############################################################################
   phpmyadmin:
-    # Use the LTS version of phpMyAdmin image
     image: phpmyadmin:5.2-apache
     ports:
-      - "${PHPMYADMIN_PORT:-8080}:80" # Map port 8080 by default or a custom one on the host to port 80 in the container
+      - "${PHPMYADMIN_PORT:-8080}:80" # Map host port to container port (default: 8080)
     environment:
-      PMA_HOST: db # The hostname of the database service to connect to
-      PMA_PORT: 3306 # The port number of the database service
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD} # Connect with root password
+      PMA_HOST: db # Connect to the 'db' service
+      PMA_PORT: 3306
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_USER_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     depends_on:
-      - db # Ensure that the db service is available before starting phpMyAdmin
+      - db # Wait for the database to be ready before starting
     networks:
-      - app-network # Connect to the same network as other services to allow communication
+      - app-network
 
-# Define a custom network to enable communication between the db and backend services
+################################################################################
+# Networks Configuration
+################################################################################
 networks:
   app-network:
-    driver: bridge
+    driver: bridge # Use a bridge network for inter-container communication
 
-# Define volumes for data persistence
+################################################################################
+# Volumes Configuration
+################################################################################
 volumes:
-  mysql_data: # Volume for persisting MySQL data
+  mysql_data: # Persist MySQL data even if the container is removed
