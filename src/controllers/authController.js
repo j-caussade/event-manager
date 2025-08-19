@@ -8,6 +8,9 @@
 // Import the authService module which contains the business logic for authentication operations
 const authService = require("../services/authService");
 
+// Import the sanitize and validate function
+const dataSanitizeUtils = require("../utils/dataSanitazeUtils");
+
 /**
  * Handles a user registration request.
  *
@@ -36,8 +39,45 @@ const register = async (req, res) => {
         .status(400)
         .json({ error: "Missing required user information" });
     }
+    // Validate user_first_name
+    const firstNameValidation = dataSanitizeUtils.validateName(
+      req.body.user_first_name
+    );
+    if (!firstNameValidation.valid) {
+      return res.status(400).json({ error: firstNameValidation.error });
+    }
+    // Validate user_last_name
+    const lastNameValidation = dataSanitizeUtils.validateName(
+      req.body.user_last_name
+    );
+    if (!lastNameValidation.valid) {
+      return res.status(400).json({ error: lastNameValidation.error });
+    }
+    // Validate user_email
+    const emailValidation = dataSanitizeUtils.validateEmail(
+      req.body.user_email
+    );
+    if (!emailValidation.valid) {
+      return res.status(400).json({ error: emailValidation.error });
+    }
+    // Validate user_password
+    const passwordValidation = dataSanitizeUtils.validatePassword(
+      req.body.user_password
+    );
+    if (!passwordValidation.valid) {
+      return res.status(400).json({ error: passwordValidation.error });
+    }
+    // Sanitize user input to prevent XSS and trim whitespace
+    const userData = {
+      user_first_name: dataSanitizeUtils.sanitizeString(
+        req.body.user_first_name
+      ),
+      user_last_name: dataSanitizeUtils.sanitizeString(req.body.user_last_name),
+      user_email: dataSanitizeUtils.sanitizeEmail(req.body.user_email),
+      user_password: dataSanitizeUtils.sanitizeString(req.body.user_password),
+    };
     // Call the registerUser method from authService to register a new user
-    const userId = await authService.registerUser(req.body);
+    const userId = await authService.registerUser(userData);
     // Send a success response with a confirmation message and the user's ID
     res.status(201).json({
       message: "User registered successfully",
@@ -80,6 +120,13 @@ const login = async (req, res) => {
     }
     // Extract user_email and user_password from the request body
     const { user_email, user_password } = req.body;
+    // Validate user_email
+    const emailValidation = dataSanitizeUtils.validateEmail(
+      req.body.user_email
+    );
+    if (!emailValidation.valid) {
+      return res.status(400).json({ error: emailValidation.error });
+    }
     // Call the loginUser method from authService to authenticate the user
     const token = await authService.loginUser(user_email, user_password);
     // Send a success response with the JWT
@@ -119,6 +166,11 @@ const changePassword = async (req, res) => {
       return res
         .status(400)
         .json({ error: "Current password and new password are required" });
+    }
+    // Validate new password
+    const passwordValidation = validatePassword(req.body.newPassword);
+    if (!passwordValidation.valid) {
+      return res.status(400).json({ error: passwordValidation.error });
     }
     // Extract user ID from the JWT (assuming it's attached to req.user by a previous middleware)
     const userId = req.user.id;
