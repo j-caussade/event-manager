@@ -4,17 +4,21 @@
 
 ## Description
 
-Event management project containerized with Docker and developed in Node.js and Express for the backend, with a MySQL relational database accessible with phpMyAdmin.
+Backend of event management project containerized with Docker and developed in Node.js and Express, with a MySQL relational database accessible with phpMyAdmin.
 
 ## Table of Contents
 
 - [Local installation procedure](#local-installation-procedure)
 - [Project architecture overview](#project-architecture-overview)
+- [Docker services](#docker-services)
 - [Contribution guidelines](#contribution-guidelines)
 - [Deploying on VPS](#deploying-on-vps)
 - [CI/CD Pipeline](#ci-cd-pipeline)
+- [Data schema](#data-schema)
 - [Database](#database)
 - [Authentication](#authentication)
+- [API Documentation](#api-documentation)
+- [Testing the API with Insomnia](#testing-the-api-with-insomnia)
 
 ## Local Installation Procedure
 
@@ -27,13 +31,16 @@ Event management project containerized with Docker and developed in Node.js and 
 
 ### Setup
 
-chmod +x ./database/init-users.sh
-
 To set up the project locally, follow these steps:
 
 1. **Clone the repository**: Use the `git clone git@github.com:j-caussade/eventura.git` command to clone the project repository. The use of an **SSH key** is mandatory. If you don't have one, follow the [GitHub instructions](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent) to create and add one (use ED25519 type).
-2. **Initialize server**: Navigate to the server directory and install dependencies with `npm install`. Create a `.env` file based on the example to be able to run the backend.
-3. **Prepare and launch Docker**: Navigate to the main directory of the project and create a `.env` file based on the example. You need to specify the environment (`dev` or `prod`). Use the command in the main directory `sudo docker compose up --build` to download images and start containers.
+
+2. **Install dependencies**: From the root directory of the project, run `npm install` to install all required dependencies.
+
+3. **Environment variables configuration**: Copy `.env.example` to `.env` at the root of the project and fill in the required values. You need to specify the environment (`dev` or `prod`).  
+   **¡Warning!:** Test user credentials are for local development only. Never use them in production.
+
+4. **Launch Docker**: Use the command `sudo docker compose up --build` to download the necessary images start the containers and application. The application and API will be available at `http://localhost:3000`.
 
 ## Project Architecture Overview
 
@@ -41,15 +48,43 @@ The project is structured with a focus on modularity and separation of concerns.
 
 - `./.github/`: Contains the workflow files for the CI/CD pipeline, which automate the testing and deployment processes.
 
-- `./database/`: Contains the scripts to create and populate the project database when launching containers.
+- `./database/`: Contains the scripts to create and populate the project database when launching containers. This includes a `.sh` script that handles the creation of database users (root, application, etc.).
 
 - `./src/`: This directory contains the main logic of the application and is organized into several sub-directories:
-  - `app.js`: The main application file that initializes the Express server and connects different parts of the application.
-  - `controllers/`: Contains the controllers responsible for managing the business logic of the application.
-  - `middlewares/`: Includes middleware functions, such as `authMiddleware.js`, used to process requests before they reach controllers.
-  - `routes/`: Defines the application routes, responsible for directing HTTP requests to appropriate controller functions.
-  - `services/`: Contains service modules that encapsulate business logic and data processing.
-  - `utils/`: Utility functions and helpers, including `db.js` for managing database connections.
+
+  - `./app.js`: The main application file that initializes the Express server and connects different parts of the application.
+
+  - `./config/`:
+
+    - `./dbConfig.js`: MySQL database connection configuration. Centralizes connection parameters for easy environment management and deployment. Uses environment variables to ensure security and flexibility across different environments (development, staging, production).
+
+  - `./controllers/`: Contains the controllers responsible for managing the business logic of the application.
+
+  - `./middlewares/`:
+
+    - `./authMiddleware.js`: Middleware function used to process requests before they reach controllers, including authentication and authorization logic.
+
+  - `./routes/`: Defines the application routes, responsible for directing HTTP requests to appropriate controller functions.
+
+  - `./services/`: Contains service modules that encapsulate business logic and data processing.
+
+  - `./utils/`:
+    - `./dataSanitizeUtils.js`: Utility functions for cleaning and securing user input data.
+    - `./dbUtils.js`: Utility functions for managing MySQL database connections. Provides a connection pool and helper functions to interact with the database efficiently.
+    - `./jwtUtils.js`: Handles the extraction of user IDs from tokens during authentication.
+
+## Docker services
+
+The `docker-compose.yml` file defines the following services :
+
+| Service    | Description                                               | Ports                    |
+| ---------- | --------------------------------------------------------- | ------------------------ |
+| db         | MySQL 8.0 database (persistent data in mysql_data volume) | 3306                     |
+| app        | Node.js application (built from the Dockerfile)           | ${PORT:-3000}            |
+| phpmyadmin | phpMyAdmin for database management                        | ${PHPMYADMIN_PORT:-8080} |
+
+- **Networks**: All services communicate via a bridge network (app-network).
+- **Volumes**: MySQL data is persisted in the mysql_data volume.
 
 ## Contribution Guidelines
 
@@ -111,15 +146,33 @@ The project uses GitHub Actions for Continuous Integration to test changes befor
 
 The deployment workflow automatically deploys the latest changes from the repository to the VPS. It is triggered by pushes to the `master` branch, ensuring the production environment is kept up-to-date.
 
+## Data schema
+
+**Conceptual data model**  
+_High-level view of entities and their relationships without technical details._
+![Conceptual Data Model](./docs/schemas/conceptual-data-model.png)
+
+**Logical Data Model**  
+_Detailed view of entities, attributes, and relationships, independent of the database technology._
+![Logical Data Model](./docs/schemas/logical-data-model.png)
+
+**Physical Data Model**  
+_Implementation-specific schema for MySQL, including tables, columns, data types, and constraints._
+![Physical Data Model](./docs/schemas/physical-data-model.png)
+
 ## Database
 
-The project uses a MySQL database, which is set up and initialized using SQL scripts. Here's how the database is configured and managed:
+The project uses a MySQL for data storage, which is set up and initialized using SQL scripts and shell scripts. Here's how the database is configured and managed:
 
 ### SQL Scripts
 
-- **Schema Script**: Located at `./database/schema.sql`, this script is responsible for creating the database schema, including tables and initial setup. It should be used to set up the database structure.
+- **./database/schema.sql**: Creates the database schema (tables, indexes, etc.).
 
-- **Data Script**: Located at `./database/data.sql`, this script is used to populate the database with initial data. It is executed after the schema script to ensure all tables are properly set up before data insertion.
+- **./database/data.sql**: Populates the database with test data for immediate application testing.
+
+### Shell Scripts
+
+- **/database/init-db-users.sh**: Bash script that creates a **root** user for database initialization and a dedicated MySQL application **user** (with restricted CRUD permissions).
 
 ### Dependencies
 
@@ -131,7 +184,9 @@ The project relies on the following key dependencies for database interactions:
 
 - **Environment Variables**: The project uses environment variables to manage database configurations. These variables are defined in the `.env` file located at the root of the project directory.
 
-- **Database Connection**: The database connection is managed using MySQL2, a Node.js driver for MySQL. The connection setup can be found in the file `./src/utils/db.js`. This file contains the configuration and logic for connecting to the MySQL database.
+- **Database Connection**:
+  - Configuration parameters are centralized in `./config/dbConfig.js`, which uses environment variables for security and flexibility.
+  - The connection logic and utility functions are implemented in `./src/utils/dbUtils.js`, which provides a connection pool and helper functions for efficient database interactions.
 
 ## Authentication
 
@@ -146,3 +201,178 @@ The authentication system is designed to secure access to certain routes and ens
 - **Routes**: Specific routes are defined for authentication purposes, including endpoints for user registration and login. These routes are linked to their respective controller functions.
 
 - **Middleware**: Authentication middleware is used to protect certain routes. It checks for valid JWT tokens in incoming requests and ensures that only authenticated and authorized users can access protected endpoints.
+
+## API Documentation
+
+The API is built with Express.js and uses JWT for authentication. Below are the main endpoints:
+
+### Authentication
+
+- **POST** `/api/v1/auth/register`: Register a new user.
+
+  - **Request body**:
+    ```json
+    {
+      "user_first_name": "Jean",
+      "user_last_name": "Dupont",
+      "user_email": "jean.dupont@example.com",
+      "user_password": "UserPassword1234@" // Password must be at least 8 characters long and include at least one uppercase letter, one number, and one symbol.
+    }
+    ```
+  - **Response**:
+    ```json
+    {
+      "message": "User registered successfully",
+      "userId": 3
+    }
+    ```
+
+- **POST** `/api/v1/auth/login`: Authenticate a user (requires JWT authentication).
+
+  - **Headers**:
+
+    - Authorization: Bearer token
+
+  - **Request body** :
+    ```json
+    {
+      "user_email": "jean.dupont@example.com",
+      "user_password": "UserPassword1234@"
+    }
+    ```
+  - **Response**:
+
+    ```json
+    {
+      "message": "Login successful",
+      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Niwicm9sZSI6MCwiaWF0IjoxNzU1NzExNDM5LCJleHAiOjE3NTU3MTUwMzl9.ZYpSH2bMcT7M5oufV4YF77_vN95g2M2aJWixNzmT8Z8"
+    }
+    ```
+
+  - **Error response** :
+    ```json
+    {
+      "error": "Invalid credentials"
+    }
+    ```
+
+### Users
+
+- **GET** `/api/v1/users/account`: User account information.
+
+  - **Headers**:
+
+    - Authorization: Bearer token
+
+  - **Response** :
+
+    ```json
+    {
+      "user_first_name": "Jean",
+      "user_last_name": "Dupont"
+    }
+    ```
+
+    - **Error response** :
+
+    ```json
+    {
+      "error": "Invalid token",
+      "message": "The provided authentication token is invalid or has expired"
+    }
+    ```
+
+- **PUT** `/api/v1/auth/change-password`: User reset password.
+
+  - **Request body** :
+    ```json
+    {
+      "currentPassword": "UserPassword1234@",
+      "newPassword": "UserNewPassword5678@"
+    }
+    ```
+  - **Response** :
+
+    ```json
+    {
+      "message": "Password changed successfully"
+    }
+    ```
+
+    - **Error response** :
+
+    ```json
+    {
+      "error": "Current password is incorrect"
+    }
+    ```
+
+### Business logic
+
+- **GET** `/api/v1/events/with-locations-and-organizers`: Retrieve a list of events with their locations and organizers. Authentication is optional but provides additional information.
+
+  - **Headers** (if authenticate):
+
+    - Authorization: Bearer token
+
+  - **Response** :
+
+    ```json
+    [
+      {
+        "event_id": 1,
+        "event_name": "Tech Conference 2025",
+        "event_start_date": "2025-11-15T09:00:00.000Z",
+        "remaining_seats": 499,
+        "event_thumbnail": "https://example.com/images/tech-conference-thumbnail.jpg",
+        "location_name": "Eiffel Tower",
+        "postal_code_number": 75000,
+        "city_name": "Paris",
+        "organizer_name": "Event Masters",
+        "is_user_registered": 0 // Only present if user is authenticated
+      }
+    ]
+    ```
+
+    - **Notes**:
+
+      - If the user is not authenticated, the **is_user_registered** field will not be included in the response.
+
+      - If the user is authenticated, the **is_user_registered** field indicates whether the user is registered for the event (1 for registered, 0 for not registered).
+
+- **GET** `/api/v1/events/with-locations-and-organizers/:id`: Retrieve a specific event with is location and organizer(s). Authentication is optional but provides additional information.
+
+  - **Params**:
+
+    - Path parameters: event_id
+
+  - **Headers** (if authenticate):
+
+    - Authorization: Bearer token
+
+  - **Response** :
+
+    ```json
+    {
+      "event_id": 2,
+      "event_name": "International Food Festival",
+      "event_start_date": "2025-12-01T10:00:00.000Z",
+      "event_end_date": "2025-12-03T20:00:00.000Z",
+      "remaining_seats": 999,
+      "event_description": "A celebration of world cuisines with cooking demonstrations, tastings, and cultural events.",
+      "event_thumbnail": "https://example.com/images/food-festival-thumbnail.jpg",
+      "location_name": "Lyon Convention Center",
+      "postal_code_number": 69000,
+      "city_name": "Lyon",
+      "organizer_name": "Conference Pros",
+      "is_user_registered": 0 // Only present if user is authenticated
+    }
+    ```
+
+    - **Notes**:
+
+      - If the user is not authenticated, the **is_user_registered** field will not be included in the response.
+
+      - If the user is authenticated, the **is_user_registered** field indicates whether the user is registered for the event (1 for registered, 0 for not registered).
+
+## Testing the API with Insomnia
