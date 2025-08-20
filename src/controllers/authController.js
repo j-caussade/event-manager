@@ -168,7 +168,9 @@ const changePassword = async (req, res) => {
         .json({ error: "Current password and new password are required" });
     }
     // Validate new password
-    const passwordValidation = validatePassword(req.body.newPassword);
+    const passwordValidation = dataSanitizeUtils.validatePassword(
+      req.body.newPassword
+    );
     if (!passwordValidation.valid) {
       return res.status(400).json({ error: passwordValidation.error });
     }
